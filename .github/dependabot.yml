@@ -12,3 +12,8 @@ updates:
       - johanneshiry
       - t-ober
       - sensarmad
+    ignore:
+      - dependency-name: org.scalatest:scalatest_2.13
+        versions:
+          - "3.3.0-SNAP2"
+          - "3.3.0-SNAP3"
