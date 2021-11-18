@@ -214,3 +214,6 @@ src/test/resources/uuids.txt
 # Don't commit the virtual environment of python
 **/venv
 docs/readthedocs/_build
+
+# Ignore Gradle build output directory
+build
