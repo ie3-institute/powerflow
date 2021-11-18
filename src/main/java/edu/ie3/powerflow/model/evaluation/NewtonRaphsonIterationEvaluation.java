@@ -143,7 +143,7 @@ public class NewtonRaphsonIterationEvaluation extends Throwable implements Power
   }
 
   @Override
-  public LinkedList getIterations() {
-    return null;
+  public LinkedList<PowerFlowEvaluation> getIterations() {
+    return new LinkedList<>();
   }
 }
