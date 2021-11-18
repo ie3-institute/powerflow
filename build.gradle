@@ -17,6 +17,7 @@ ext {
 	scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
 }
 
+apply from: scriptsLocation + '/checkJavaVersion.gradle'
 apply from: scriptsLocation + '/spotless.gradle'
 apply from: scriptsLocation + '/pmd.gradle'
 apply from: scriptsLocation + '/scoverage.gradle'
