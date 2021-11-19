@@ -8,4 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial project structure and code
 
+### Changed
+- Reduce log pollution for not provided node order
+
 [Unreleased]: https://github.com/ie3-institute/powerflow
