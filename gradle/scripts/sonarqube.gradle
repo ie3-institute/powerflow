@@ -1,14 +1,13 @@
 sonarqube {
 	properties {
 		// general stuff
-		property 'sonar.projectName', 'powerfactory2psdm' // project name
+		property 'sonar.projectName', 'powerflow' // project name
 		property 'sonar.verbose', 'true' // verbose mode
 		property 'sonar.sourceEncoding', 'UTF-8' // encoding
-		property 'sonar.sources', [
-			'src/main/resources',
-			'src/main/scala'] // src dirs
+		property 'sonar.sources', ['src/main/scala'] // src dirs
 		property "sonar.tests", [
 			'src/test/resources',
+			'src/test/groovy',
 			'src/test/scala'] // test src dirs
 		// reports stuff (for all languages)
 		property 'sonar.junit.reportPaths', [
@@ -19,10 +18,6 @@ sonarqube {
 			"build/reports/scapegoat/testsrc/scapegoat-scalastyle.xml"] // Comma-delimited list of paths to Scapegoat reports in the Scalastyle format
 		// scala specific stuff
 		property 'sonar.scala.coverage.reportPaths', 'build/reports/scoverage/scoverage.xml'
-		// remove auto generated RawGridModel file from sonarqube analysis
-		property 'sonar.exclusions', [
-			"src/main/scala/edu/ie3/powerFactory2psdm/model/powerfactory/RawGridModel.scala"
-		]
 	}
 }
 
