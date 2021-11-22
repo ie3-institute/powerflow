@@ -12,8 +12,8 @@ import java.util.Arrays;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extended Newton Raphson power flow algorithm, guessing the start vector of nodal voltages based
@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 @Deprecated
 public class PowerFlowNRExtended extends PowerFlowNR {
 
-  private static final Logger logger = LogManager.getLogger("powerFlowEvaluation");
+  private static final Logger logger = LoggerFactory.getLogger("powerFlowEvaluation");
 
   private static final double DEVIATION_WARN_THRESHOLD = 0.1;
 

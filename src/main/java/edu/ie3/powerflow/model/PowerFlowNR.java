@@ -33,8 +33,8 @@ import org.apache.commons.math3.linear.FieldMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SparseFieldMatrix;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Kittl
@@ -44,7 +44,7 @@ import org.apache.logging.log4j.Logger;
 @Deprecated
 public class PowerFlowNR implements PowerFlowAlgorithm {
 
-  private static final Logger logger = LogManager.getLogger(PowerFlowNR.class);
+  private static final Logger logger = LoggerFactory.getLogger(PowerFlowNR.class);
 
   /* Convergence threshold */
   private double epsilon;
