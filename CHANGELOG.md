@@ -12,4 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reduce log pollution for not provided node order
 - Change logging framework to logback
 
+### Removed
+- Spock testing framework
+
 [Unreleased]: https://github.com/ie3-institute/powerflow
