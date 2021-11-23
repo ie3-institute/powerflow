@@ -15,9 +15,15 @@ ext {
   javaVersion = JavaVersion.VERSION_1_8
   scalaVersion = '2.13'
   scalaBinaryVersion = '2.13.6'
-  slf4jVersion = '1.7.32'
+
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
 }
+
+group = 'com.github.ie3-institute'
+version = '0.1-SNAPSHOT'
+description = 'powerflow'
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
 apply from: scriptsLocation + '/checkJavaVersion.gradle'
 apply from: scriptsLocation + '/spotless.gradle'
@@ -92,12 +98,12 @@ compileTestScala {
     "-P:scapegoat:disabledInspections:VariableShadowing"
   ]
 }
-group = 'com.github.ie3-institute'
-version = '0.1-SNAPSHOT'
-description = 'powerflow'
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+
 tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc){
   options.encoding = 'UTF-8'
 }
 
