@@ -64,7 +64,7 @@ object NodeData extends LazyLogging {
   )(implicit ct: ClassTag[T]): Array[T] = {
     intendedOrder match {
       case None =>
-        logger.warn(
+        logger.debug(
           "There is no intended order provided, cannot correct the order!"
         )
         unordered

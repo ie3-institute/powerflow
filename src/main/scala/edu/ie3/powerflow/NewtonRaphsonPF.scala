@@ -69,7 +69,7 @@ final case class NewtonRaphsonPF(
         "The intended amount of nodes does not fit the dimensions of the admittance matrix!"
       )
     case None =>
-      logger.info(
+      logger.debug(
         "You did not provide an intended node ordering, therefore no sanity checks will be performed"
       )
     case _ =>
