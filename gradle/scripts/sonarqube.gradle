@@ -7,7 +7,6 @@ sonarqube {
     property 'sonar.sources', ['src/main/scala'] // src dirs
     property "sonar.tests", [
       'src/test/resources',
-      'src/test/groovy',
       'src/test/scala'] // test src dirs
     // reports stuff (for all languages)
     property 'sonar.junit.reportPaths', [

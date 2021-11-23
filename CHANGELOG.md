@@ -13,4 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change logging framework to logback
 - Add deployment capabilities
 
+### Removed
+- Spock testing framework
+
 [Unreleased]: https://github.com/ie3-institute/powerflow
