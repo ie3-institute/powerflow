@@ -1,7 +1,7 @@
 /* Maven publish - start */
 task sourcesJar(type: Jar) {
   classifier "sources"
-  from sourceSets.main.allJava
+  from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -86,9 +86,9 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
         }
 
         removeTestDependenciesFromPom(pom)
-        groupId group
+        groupId this.group
         artifactId 'powerflow'
-        version version
+        version this.version
 
         from components.java
         artifact sourcesJar
@@ -100,7 +100,7 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
       maven {
         def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
         def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-        url = versionString.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        url = this.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
         credentials {
           username project.getProperty('user')
           password project.getProperty('password')
