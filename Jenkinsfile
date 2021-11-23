@@ -1,5 +1,10 @@
-#!groovy​
+#!groovy
 
+/*
+ * © 2021. TU Dortmund University,
+ * Institute of Energy Systems, Energy Efficiency and Energy Economics,
+ * Research group Distribution grid planning and operation
+ */
 
 ////////////////////////////////
 // general config values
@@ -13,7 +18,9 @@ final String rocketChatChannel = "jenkins"
 projects = ['powerflow']
 
 orgNames = ['ie3-institute']
-urls = ['git@github.com:' + orgNames.get(0)]
+urls = [
+    'git@github.com:' + orgNames.get(0)
+]
 
 def sonarqubeProjectKey = "edu.ie3:powerflow"
 
@@ -73,7 +80,7 @@ if (env.BRANCH_NAME == "main") {
 
                     // notify rocket chat about the deployment
                     rocketSend channel: rocketChatChannel, emoji: ':jenkins_triggered:',
-                            message: "deploying v"+projectVersion+" to oss sonatype. if this is a release deployment pls remember to stage and release afterwards!\n"
+                    message: "deploying v"+projectVersion+" to oss sonatype. if this is a release deployment pls remember to stage and release afterwards!\n"
                     rawMessage: true
 
                     // set java version
@@ -100,7 +107,8 @@ if (env.BRANCH_NAME == "main") {
 
                     // execute sonarqube code analysis
                     stage('SonarQube analysis') {
-                        withSonarQubeEnv() { // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
+                        withSonarQubeEnv() {
+                            // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
                             gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dsonar.cpd.exclusions=src/main/java/edu/ie3/util/quantities/dep/PowerSystemUnits.java")
                         }
                     }
@@ -122,7 +130,9 @@ if (env.BRANCH_NAME == "main") {
                         publishReports()
 
                         // inform codecov.io
-                        withCredentials([string(credentialsId: codeCovTokenId, variable: 'codeCovToken')]) {
+                        withCredentials([
+                            string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
+                        ]) {
                             // call codecov
                             sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
                         }
@@ -132,9 +142,11 @@ if (env.BRANCH_NAME == "main") {
                     // deploy snapshot version to oss sonatype
                     stage('deploy') {
                         // get the sonatype credentials stored in the jenkins secure keychain
-                        withCredentials([usernamePassword(credentialsId: mavenCentralCredentialsId, usernameVariable: 'mavencentral_username', passwordVariable: 'mavencentral_password'),
-                                         file(credentialsId: mavenCentralSignKeyFileId, variable: 'mavenCentralKeyFile'),
-                                         usernamePassword(credentialsId: mavenCentralSignKeyId, passwordVariable: 'signingPassword', usernameVariable: 'signingKeyId')]) {
+                        withCredentials([
+                            usernamePassword(credentialsId: mavenCentralCredentialsId, usernameVariable: 'mavencentral_username', passwordVariable: 'mavencentral_password'),
+                            file(credentialsId: mavenCentralSignKeyFileId, variable: 'mavenCentralKeyFile'),
+                            usernamePassword(credentialsId: mavenCentralSignKeyId, passwordVariable: 'signingPassword', usernameVariable: 'signingKeyId')
+                        ]) {
                             deployGradleTasks = "--refresh-dependencies clean check " + deployGradleTasks + "publish -Puser=${env.mavencentral_username} -Ppassword=${env.mavencentral_password} -Psigning.keyId=${env.signingKeyId} -Psigning.password=${env.signingPassword} -Psigning.secretKeyRingFile=${env.mavenCentralKeyFile}"
 
                             // see https://docs.gradle.org/6.0.1/release-notes.html "Publication of SHA256 and SHA512 checksums"
@@ -145,10 +157,10 @@ if (env.BRANCH_NAME == "main") {
 
                         // notify rocket chat
                         rocketSend channel: rocketChatChannel, emoji: ':jenkins_party:',
-                                message: "deployment v"+projectVersion+" successful. If this was a release deployment pls remember visiting https://oss.sonatype.org " +
-                                        "to stage and release the artifact!" +
-                                        "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
-                                        "*branch:* main \n"
+                        message: "deployment v"+projectVersion+" successful. If this was a release deployment pls remember visiting https://oss.sonatype.org " +
+                        "to stage and release the artifact!" +
+                        "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
+                        "*branch:* main \n"
                         rawMessage: true
                     }
 
@@ -165,9 +177,9 @@ if (env.BRANCH_NAME == "main") {
 
                     // notify rocket chat
                     rocketSend channel: rocketChatChannel, emoji: ':jenkins_explode:',
-                            message: "deployment v"+projectVersion+" failed!\n" +
-                                    "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
-                                    "*branch:* main\n"
+                    message: "deployment v"+projectVersion+" failed!\n" +
+                    "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
+                    "*branch:* main\n"
                     rawMessage: true
                 }
 
@@ -204,7 +216,7 @@ if (env.BRANCH_NAME == "main") {
 
                     // notify rocket chat about the started feature branch run
                     rocketSend channel: rocketChatChannel, emoji: ':jenkins_triggered:',
-                            message: message + "\n"
+                    message: message + "\n"
                     rawMessage: true
 
                     // set build display name
@@ -244,7 +256,9 @@ if (env.BRANCH_NAME == "main") {
                         publishReports()
 
                         // inform codecov.io
-                        withCredentials([string(credentialsId: codeCovTokenId, variable: 'codeCovToken')]) {
+                        withCredentials([
+                            string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
+                        ]) {
                             // call codecov
                             sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
                         }
@@ -254,9 +268,11 @@ if (env.BRANCH_NAME == "main") {
                     // deploy snapshot version to oss sonatype
                     stage('deploy') {
                         // get the sonatype credentials stored in the jenkins secure keychain
-                        withCredentials([usernamePassword(credentialsId: mavenCentralCredentialsId, usernameVariable: 'mavencentral_username', passwordVariable: 'mavencentral_password'),
-                                         file(credentialsId: mavenCentralSignKeyFileId, variable: 'mavenCentralKeyFile'),
-                                         usernamePassword(credentialsId: mavenCentralSignKeyId, passwordVariable: 'signingPassword', usernameVariable: 'signingKeyId')]) {
+                        withCredentials([
+                            usernamePassword(credentialsId: mavenCentralCredentialsId, usernameVariable: 'mavencentral_username', passwordVariable: 'mavencentral_password'),
+                            file(credentialsId: mavenCentralSignKeyFileId, variable: 'mavenCentralKeyFile'),
+                            usernamePassword(credentialsId: mavenCentralSignKeyId, passwordVariable: 'signingPassword', usernameVariable: 'signingKeyId')
+                        ]) {
                             deployGradleTasks = "--refresh-dependencies clean check " + deployGradleTasks + "publish -Puser=${env.mavencentral_username} -Ppassword=${env.mavencentral_password} -Psigning.keyId=${env.signingKeyId} -Psigning.password=${env.signingPassword} -Psigning.secretKeyRingFile=${env.mavenCentralKeyFile}"
 
                             gradle("${deployGradleTasks}")
@@ -267,9 +283,9 @@ if (env.BRANCH_NAME == "main") {
                                 "main branch build successful! Merged pr from feature branch '${featureBranchName}'"
                                 : "main branch build successful! Build commit with message is '${jsonObject.commit.message}'"
                         rocketSend channel: rocketChatChannel, emoji: ':jenkins_party:',
-                                message: message + "\n" +
-                                        "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
-                                        "*branch:* main \n"
+                        message: message + "\n" +
+                        "*repo:* ${urls.get(0)}/${projects.get(0)}\n" +
+                        "*branch:* main \n"
                         rawMessage: true
                     }
                 } catch (Exception e) {
@@ -285,24 +301,17 @@ if (env.BRANCH_NAME == "main") {
 
                     // notify rocket chat
                     rocketSend channel: rocketChatChannel, emoji: ':jenkins_explode:',
-                            message: "merge feature into main failed!\n" +
-                                    "*repo:* ${urls.get(0)}/${projects.get(0)}\n"
+                    message: "merge feature into main failed!\n" +
+                    "*repo:* ${urls.get(0)}/${projects.get(0)}\n"
                     rawMessage: true
                 }
-
             }
-
         }
-
     }
-
 } else {
-
     // setup
     getFeatureBranchProps()
-
     node {
-
         def repoName = ""
         // init variables depending of this build is triggered by a branch with PR or without PR
         if (env.CHANGE_ID == null) {
@@ -316,9 +325,7 @@ if (env.BRANCH_NAME == "main") {
 
             featureBranchName = jsonObj.head.ref
             repoName = jsonObj.head.repo.full_name
-
         }
-
 
         ansiColor('xterm') {
             try {
@@ -330,22 +337,19 @@ if (env.BRANCH_NAME == "main") {
 
                 // notify rocket chat about the started feature branch run
                 rocketSend channel: rocketChatChannel, emoji: ':jenkins_triggered:',
-                        message: "feature branch build triggered:\n" +
-                                "*repo:* ${repoName}\n" +
-                                "*branch:* ${featureBranchName}\n"
+                message: "feature branch build triggered:\n" +
+                "*repo:* ${repoName}\n" +
+                "*branch:* ${featureBranchName}\n"
                 rawMessage: true
 
                 stage('checkout from scm') {
-
                     try {
                         commitHash = gitCheckout(projects.get(0), urls.get(0), featureBranchName, sshCredentialsId).GIT_COMMIT
                     } catch (exc) {
                         // our target repo failed during checkout
                         sh 'exit 1' // failure due to not found forcedPR branch
                     }
-
                 }
-
                 // test the project
                 stage("gradle check ${projects.get(0)}") {
                     // build and test the project
@@ -354,7 +358,8 @@ if (env.BRANCH_NAME == "main") {
 
                 // execute sonarqube code analysis
                 stage('SonarQube analysis') {
-                    withSonarQubeEnv() { // Will pick the global server connection from jenkins for sonarqube
+                    withSonarQubeEnv() {
+                        // Will pick the global server connection from jenkins for sonarqube
 
                         // do we have a PR?, TODO: Remove with removal of deprecated quantity package
                         String gradleCommand = "sonarqube -Dsonar.projectKey=$sonarqubeProjectKey"
@@ -364,7 +369,6 @@ if (env.BRANCH_NAME == "main") {
                         } else {
                             gradleCommand = gradleCommand + " -Dsonar.branch.name=$featureBranchName"
                         }
-
 
                         gradle(gradleCommand)
                     }
@@ -386,16 +390,18 @@ if (env.BRANCH_NAME == "main") {
                     // publish reports
                     publishReports()
 
-                    withCredentials([string(credentialsId: codeCovTokenId, variable: 'codeCovToken')]) {
+                    withCredentials([
+                        string(credentialsId: codeCovTokenId, variable: 'codeCovToken')
+                    ]) {
                         // call codecov
                         sh "curl -s https://codecov.io/bash | bash -s - -t ${env.codeCovToken} -C ${commitHash}"
                     }
 
                     // notify rocket chat
                     rocketSend channel: rocketChatChannel, emoji: ':jenkins_party:',
-                            message: "feature branch test successful!\n" +
-                                    "*repo:* ${repoName}\n" +
-                                    "*branch:* ${featureBranchName}\n"
+                    message: "feature branch test successful!\n" +
+                    "*repo:* ${repoName}\n" +
+                    "*branch:* ${featureBranchName}\n"
                     rawMessage: true
                 }
             } catch (Exception e) {
@@ -411,32 +417,34 @@ if (env.BRANCH_NAME == "main") {
 
                 // notify rocket chat
                 rocketSend channel: rocketChatChannel, emoji: ':jenkins_explode:',
-                        message: "feature branch test failed!\n" +
-                                "*repo:* ${repoName}\n" +
-                                "*branch:* ${featureBranchName}\n"
+                message: "feature branch test failed!\n" +
+                "*repo:* ${repoName}\n" +
+                "*branch:* ${featureBranchName}\n"
                 rawMessage: true
             }
-
         }
     }
 }
 
 
 def getFeatureBranchProps() {
-
     properties(
-            [pipelineTriggers([
-                    issueCommentTrigger('.*!test.*')])
+            [
+                pipelineTriggers([
+                    issueCommentTrigger('.*!test.*')
+                ])
             ])
-
 }
 
 
 def getMasterBranchProps() {
-    properties([parameters(
-            [string(defaultValue: '', description: '', name: 'deploy', trim: true)]),
-                [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
-                [$class: 'ThrottleJobProperty', categories: [], limitOneJobWithMatchingParams: false, maxConcurrentPerNode: 0, maxConcurrentTotal: 0, paramsToUseForLimit: '', throttleEnabled: true, throttleOption: 'project']
+    properties([
+        parameters(
+        [
+            string(defaultValue: '', description: '', name: 'deploy', trim: true)
+        ]),
+        [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
+        [$class: 'ThrottleJobProperty', categories: [], limitOneJobWithMatchingParams: false, maxConcurrentPerNode: 0, maxConcurrentTotal: 0, paramsToUseForLimit: '', throttleEnabled: true, throttleOption: 'project']
     ])
 }
 
@@ -447,12 +455,16 @@ def getMasterBranchProps() {
 ////////////////////////////////////
 def gitCheckout(String relativeTargetDir, String baseUrl, String branch, String sshCredentialsId) {
     checkout([
-            $class                           : 'GitSCM',
-            branches                         : [[name: branch]],
-            doGenerateSubmoduleConfigurations: false,
-            extensions                       : [[$class: 'RelativeTargetDirectory', relativeTargetDir: relativeTargetDir]],
-            submoduleCfg                     : [],
-            userRemoteConfigs                : [[credentialsId: sshCredentialsId, url: baseUrl + "/" + relativeTargetDir + ".git"]]
+        $class                           : 'GitSCM',
+        branches                         : [[name: branch]],
+        doGenerateSubmoduleConfigurations: false,
+        extensions                       : [
+            [$class: 'RelativeTargetDirectory', relativeTargetDir: relativeTargetDir]
+        ],
+        submoduleCfg                     : [],
+        userRemoteConfigs                : [
+            [credentialsId: sshCredentialsId, url: baseUrl + "/" + relativeTargetDir + ".git"]
+        ]
     ])
 }
 
