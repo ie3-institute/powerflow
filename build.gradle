@@ -44,7 +44,7 @@ dependencies {
 	testImplementation 'com.vladsch.flexmark:flexmark-all:0.62.2'
 	testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.10"
 	testImplementation "org.pegdown:pegdown:1.6.0" // HTML report for scalatest
-	testImplementation 'org.spockframework:spock-core:2.0-M1-groovy-2.5'
+	testImplementation 'org.spockframework:spock-core:2.1-M2-groovy-3.0'
 
 	// Linter Scala //
 	implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:1.4.10" // scala scapegoat
