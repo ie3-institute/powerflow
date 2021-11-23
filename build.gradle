@@ -92,7 +92,7 @@ compileTestScala {
     "-P:scapegoat:disabledInspections:VariableShadowing"
   ]
 }
-group = 'edu.ie3'
+group = 'com.github.ie3-institute'
 version = '0.1-SNAPSHOT'
 description = 'powerflow'
 sourceCompatibility = javaVersion

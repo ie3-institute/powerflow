@@ -86,9 +86,9 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
         }
 
         removeTestDependenciesFromPom(pom)
-        groupId this.group
+        groupId group
         artifactId 'powerflow'
-        version this.version
+        version version
 
         from components.java
         artifact sourcesJar
