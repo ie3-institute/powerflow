@@ -11,5 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Reduce log pollution for not provided node order
 - Change logging framework to logback
+- Add deployment capabilities
 
 [Unreleased]: https://github.com/ie3-institute/powerflow
