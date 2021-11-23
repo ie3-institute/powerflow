@@ -563,6 +563,8 @@ public class PowerFlowNR implements PowerFlowAlgorithm {
    * @param deltaV2 Array of deviation between estimated and actual squared nodal voltage magnitudes
    * @return The assembled and reduced vector of deviations as the combination of active and
    *     reactive deviation as well as deviation of squared voltage magnitudes
+   * @throws PowerFlowException If there is no vector of squared voltage magnitude deviations are
+   *     available
    */
   protected RealVector reduceDeviationVector(Complex[] deltaS, double[] deltaV2)
       throws PowerFlowException {
