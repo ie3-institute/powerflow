@@ -1,0 +1,131 @@
+/* Maven publish - start */
+task sourcesJar(type: Jar) {
+  classifier "sources"
+  from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier "javadoc"
+  from javadoc.destinationDir
+}
+
+
+if (project.hasProperty('user') && project.hasProperty('password')) {
+
+  signing {
+    required { !version.endsWith('SNAPSHOT') }
+    if (required)
+      sign(publishing.publications)
+  }
+
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+
+        versionMapping {
+          // resolves dynamic versioning to current version number
+          usage('java-api') {
+            fromResolutionOf('runtimeClasspath')
+          }
+          usage('java-runtime') {
+            fromResolutionResult()
+          }
+        }
+        pom {
+          description = 'Power flow calculation library, focused on interfacing for exchangeable algorithms'
+          name = 'powerflow'
+          url = 'https:github.com/ie3-institute/powerflow'
+          organization {
+            name = 'Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University'
+            url = 'http:www.ie3.tu-dortmund.de/'
+          }
+          issueManagement {
+            system = 'GitHub'
+            url = 'https:github.com/ie3-institute/powerflow/issues'
+          }
+          licenses {
+            license {
+              name = 'BSD 3-Clause License'
+              url = 'https:github.com/ie3-institute/powerflow/blob/master/LICENSE'
+            }
+            scm {
+              connection = 'scm:git:git:github.com/ie3-institute/powerflow.git'
+              developerConnection = 'scm:git:ssh:github.com:ie3-institute/powerflow.git'
+              url = 'https:github.com/ie3-institute/powerflow'
+            }
+            developers {
+              [
+                developer {
+                  id = 'johanneshiry'
+                  name = 'Johannes Hiry'
+                  email = 'johannes.hiry@tu-dortmund.de'
+                },
+                developer {
+                  id = 'ckittl'
+                  name = 'Chris Kittl'
+                  email = 'chris.kittl@tu-dortmund.de'
+                },
+                developer {
+                  id = 'sensarmad'
+                  name = 'Debopama Sen Sarma'
+                  email = 'debopama-sen.sarma@tu-dortmund.de'
+                },
+                developer {
+                  id = 't-ober'
+                  name = 'Thomas Oberließen'
+                  email = 'thomas.oberließen@tu-dortmund.de'
+                },
+                developer {
+                  id = 'sebastian-peter'
+                  name = 'Sebastian Peter'
+                  email = 'sebastian.peter@tu-dortmund.de'
+                }
+              ]
+            }
+          }
+        }
+
+        removeTestDependenciesFromPom(pom)
+        groupId this.group
+        artifactId 'powerflow'
+        version this.version
+
+        from components.java
+        artifact sourcesJar
+        artifact javadocJar
+
+      }
+    }
+    repositories {
+      maven {
+        def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+        def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+        url = this.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        credentials {
+          username project.getProperty('user')
+          password project.getProperty('password')
+        }
+      }
+    }
+  }
+
+
+  model {
+    tasks.generatePomFileForMavenJavaPublication {
+      destination = file("$buildDir/generated-pom.xml")
+    }
+  }
+}
+
+def removeTestDependenciesFromPom(pom) {
+
+  pom.withXml {
+    def root = asNode()
+    // eliminate test-scoped dependencies (no need in maven central POMs)
+    root.dependencies.removeAll { dep ->
+      dep.scope == "test"
+    }
+  }
+}
+
+/* Maven publish - end */
