@@ -59,7 +59,7 @@ dependencies {
   scalaCompilerPlugin "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:1.4.9" // scala scapegoat
 
   // logging //
-  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.3" // akka scala logging
+  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.4" // akka scala logging
   implementation "ch.qos.logback:logback-classic:1.2.5"
 
   implementation('com.github.ie3-institute:PowerSystemUtils:1.5.3') {
