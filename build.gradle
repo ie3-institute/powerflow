@@ -14,7 +14,7 @@ plugins {
 ext {
   javaVersion = JavaVersion.VERSION_1_8
   scalaVersion = '2.13'
-  scalaBinaryVersion = '2.13.6'
+  scalaBinaryVersion = '2.13.7'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
 }
