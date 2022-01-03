@@ -85,9 +85,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
       actual.length should be(2 * nodeCount - 2)
 
       val eval =
-        expectedDeviationVector
-          .toScalaVector()
-          .zipWithIndex
+        expectedDeviationVector.toScalaVector.zipWithIndex
           .forall(currentEntry =>
             (currentEntry._1 - actual(currentEntry._2)).abs < 1e-4
           )

@@ -6,7 +6,7 @@
 
 package edu.ie3.powerflow
 
-import breeze.linalg.{DenseMatrix, DenseVector, MatrixSingularException}
+import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.math.Complex
 import breeze.numerics.{abs, pow}
 import com.typesafe.scalalogging.LazyLogging
@@ -32,7 +32,6 @@ import edu.ie3.powerflow.util.exceptions.PowerFlowException
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success}
-import scala.util.control.ControlThrowable
 
 /** Representation of the Newton-Raphson algorithm to solve the system of
   * non-linear equations, that do describe a power grid.
@@ -308,7 +307,7 @@ case object NewtonRaphsonPF extends LazyLogging {
   ): Array[StateData] = {
     val v = StateData.extractVoltageVector(state)
     val nodalPower = v *:* (admittanceMatrix * v).map(i => i.conjugate)
-    (state zip nodalPower.toScalaVector()).map(stateAndPowerPair =>
+    (state zip nodalPower.toScalaVector).map(stateAndPowerPair =>
       stateAndPowerPair._1.copy(power = -1 * stateAndPowerPair._2)
     )
   }
@@ -336,43 +335,45 @@ case object NewtonRaphsonPF extends LazyLogging {
     )
       None
     else {
-      val intermediateOperationPoint = (operationPoint zip iterationPower
-        .toScalaVector()).map(nodeDataWithPower => {
-        val nodeData = nodeDataWithPower._1
-        val power = nodeDataWithPower._2
-        nodeData.nodeType match {
-          case NodeType.PV
-              if nodeData.reactivePowerMin.isDefined ||
-                nodeData.reactivePowerMax.isDefined =>
-            val qMin =
-              nodeData.reactivePowerMin.getOrElse(Double.NegativeInfinity)
-            val qMax =
-              nodeData.reactivePowerMin.getOrElse(Double.PositiveInfinity)
-            if (power.imag * -1 < qMin) {
-              logger.warn(
-                s"Minimum reactive power limit violated at node ${nodeData.index} " +
-                  s"(${power.imag * -1} < $qMin). Set to PQ node and limit reactive power."
-              )
-              val newApparentPower = Complex(nodeData.power.real, qMin)
-              nodeData.copy(
-                nodeType = NodeType.PQ_INTERMEDIATE,
-                power = newApparentPower
-              )
-            } else if (power.imag * -1 > qMax) {
-              logger.warn(
-                s"Maximum reactive power limit violated at node ${nodeData.index} " +
-                  s"(${power.imag * -1} > $qMin). Set to PQ node and limit reactive power."
-              )
-              val newApparentPower = Complex(nodeData.power.real, qMax)
-              nodeData.copy(
-                nodeType = NodeType.PQ_INTERMEDIATE,
-                power = newApparentPower
-              )
-            } else
-              nodeData
-          case _ => nodeData
-        }
-      })
+      val intermediateOperationPoint =
+        (operationPoint zip iterationPower.toScalaVector).map(
+          nodeDataWithPower => {
+            val nodeData = nodeDataWithPower._1
+            val power = nodeDataWithPower._2
+            nodeData.nodeType match {
+              case NodeType.PV
+                  if nodeData.reactivePowerMin.isDefined ||
+                    nodeData.reactivePowerMax.isDefined =>
+                val qMin =
+                  nodeData.reactivePowerMin.getOrElse(Double.NegativeInfinity)
+                val qMax =
+                  nodeData.reactivePowerMin.getOrElse(Double.PositiveInfinity)
+                if (power.imag * -1 < qMin) {
+                  logger.warn(
+                    s"Minimum reactive power limit violated at node ${nodeData.index} " +
+                      s"(${power.imag * -1} < $qMin). Set to PQ node and limit reactive power."
+                  )
+                  val newApparentPower = Complex(nodeData.power.real, qMin)
+                  nodeData.copy(
+                    nodeType = NodeType.PQ_INTERMEDIATE,
+                    power = newApparentPower
+                  )
+                } else if (power.imag * -1 > qMax) {
+                  logger.warn(
+                    s"Maximum reactive power limit violated at node ${nodeData.index} " +
+                      s"(${power.imag * -1} > $qMin). Set to PQ node and limit reactive power."
+                  )
+                  val newApparentPower = Complex(nodeData.power.real, qMax)
+                  nodeData.copy(
+                    nodeType = NodeType.PQ_INTERMEDIATE,
+                    power = newApparentPower
+                  )
+                } else
+                  nodeData
+              case _ => nodeData
+            }
+          }
+        )
 
       Some(intermediateOperationPoint)
     }
@@ -491,7 +492,7 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
-          (deltaE.toScalaVector() zip deltaF.toScalaVector())
+          (deltaE.toScalaVector zip deltaF.toScalaVector)
             .map(complexPair => Complex(complexPair._1, complexPair._2))
 
         val indicesOfPVPQnodes =
