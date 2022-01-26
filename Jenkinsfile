@@ -5,7 +5,6 @@
  * Institute of Energy Systems, Energy Efficiency and Energy Economics,
  * Research group Distribution grid planning and operation
  */
-
 ////////////////////////////////
 // general config values
 ////////////////////////////////
@@ -15,6 +14,12 @@
 final String rocketChatChannel = "jenkins"
 
 
+//// project build dir order
+//// this list contains the build order
+//// normally it *should* start with the project under investigation
+//// but if this projects depends on some of our other projects, you have to *build the dependencies first*!
+//// *IMPORTANT:* you *MUST* use exact repo names as this will used for checkout!
+//// *IMPORTANT2:* you must provide exact 4 elements!
 projects = ['powerflow']
 
 orgNames = ['ie3-institute']
@@ -109,8 +114,8 @@ if (env.BRANCH_NAME == "main") {
           // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dsonar.cpd.exclusions=src/main/java/edu/ie3/util/quantities/dep/PowerSystemUnits.java")
+              // Will pick the global server connection from jenkins for sonarqube
+              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
 
@@ -235,7 +240,7 @@ if (env.BRANCH_NAME == "main") {
           // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
+              // Will pick the global server connection from jenkins for sonarqube
               gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
@@ -499,7 +504,7 @@ def publishReports() {
 def gradle(String command) {
   env.JENKINS_NODE_COOKIE = 'dontKillMe' // this is necessary for the Gradle daemon to be kept alive
 
-  // switch directory to bew able to use gradle wrapper
+  // switch directory to be able to use gradle wrapper
   sh """cd ${projects.get(0)}""" + ''' set +x; ./gradlew ''' + """$command"""
 }
 
