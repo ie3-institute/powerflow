@@ -109,8 +109,8 @@ if (env.BRANCH_NAME == "main") {
           // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dorg.gradle.java.home=/opt/java/openjdk")
+              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
+              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dsonar.cpd.exclusions=src/main/java/edu/ie3/util/quantities/dep/PowerSystemUnits.java")
             }
           }
 
@@ -235,8 +235,8 @@ if (env.BRANCH_NAME == "main") {
           // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dorg.gradle.java.home=/opt/java/openjdk")
+              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
+              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
 
@@ -373,7 +373,7 @@ if (env.BRANCH_NAME == "main") {
               gradleCommand = gradleCommand + " -Dsonar.branch.name=$featureBranchName"
             }
 
-            gradle(gradleCommand + " -Dorg.gradle.java.home=/opt/java/openjdk")
+            gradle(gradleCommand)
           }
         }
 
