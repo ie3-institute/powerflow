@@ -9,8 +9,9 @@ spotless {
 
   //sets a license header, removes unused imports and formats conforming to the google java format
   java {
+    target '**.java'
     removeUnusedImports() // removes any unused imports
-    googleJavaFormat()
+    googleJavaFormat('1.13.0')
     licenseHeader ie3LicHead
   }
 
@@ -39,7 +40,7 @@ spotless {
 
   // removes unnecessary whitespace, indents with tabs and ends on new line for gradle, md and gitignore files and config-XMLs
   format 'misc', {
-    target '**/*.md', '**/.gitignore', 'configs/**'
+    target '**/.gitignore', 'configs/**'
     trimTrailingWhitespace()
     indentWithTabs()
     endWithNewline()

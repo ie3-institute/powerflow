@@ -15,6 +15,12 @@
 final String rocketChatChannel = "jenkins"
 
 
+//// project build dir order
+//// this list contains the build order
+//// normally it *should* start with the project under investigation
+//// but if this projects depends on some of our other projects, you have to *build the dependencies first*!
+//// *IMPORTANT:* you *MUST* use exact repo names as this will used for checkout!
+//// *IMPORTANT2:* you must provide exact 4 elements!
 projects = ['powerflow']
 
 orgNames = ['ie3-institute']
@@ -41,7 +47,7 @@ def mavenCentralSignKeyId = "a1357827-1516-4fa2-ab8e-72cdea07a692"
 //// define and setjava version ////
 //// requires the java version to be set in the internal jenkins java version management
 //// use identifier accordingly
-def javaVersionId = 'jdk-8'
+def javaVersionId = 'jdk-17'
 
 //// set java version method (needs node{} for execution)
 void setJavaVersion(javaVersionId) {
@@ -106,10 +112,11 @@ if (env.BRANCH_NAME == "main") {
           }
 
           // execute sonarqube code analysis
+          // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
-              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey -Dsonar.cpd.exclusions=src/main/java/edu/ie3/util/quantities/dep/PowerSystemUnits.java")
+              // Will pick the global server connection from jenkins for sonarqube
+              gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
 
@@ -231,9 +238,10 @@ if (env.BRANCH_NAME == "main") {
           }
 
           // execute sonarqube code analysis
+          // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
           stage('SonarQube analysis') {
             withSonarQubeEnv() {
-              // Will pick the global server connection from jenkins for sonarqube, TODO: Remove exclusion, when removing deprecated quantity package
+              // Will pick the global server connection from jenkins for sonarqube
               gradle("sonarqube -Dsonar.branch.name=main -Dsonar.projectKey=$sonarqubeProjectKey")
             }
           }
@@ -357,6 +365,7 @@ if (env.BRANCH_NAME == "main") {
         }
 
         // execute sonarqube code analysis
+        // IMPORTANT: Do not 'clean' here, as sonarqube relies on what has been provided by previous tasks!
         stage('SonarQube analysis') {
           withSonarQubeEnv() {
             // Will pick the global server connection from jenkins for sonarqube
@@ -496,7 +505,7 @@ def publishReports() {
 def gradle(String command) {
   env.JENKINS_NODE_COOKIE = 'dontKillMe' // this is necessary for the Gradle daemon to be kept alive
 
-  // switch directory to bew able to use gradle wrapper
+  // switch directory to be able to use gradle wrapper
   sh """cd ${projects.get(0)}""" + ''' set +x; ./gradlew ''' + """$command"""
 }
 
