@@ -19,11 +19,3 @@ sonarqube {
     property 'sonar.scala.coverage.reportPaths', 'build/reports/scoverage/scoverage.xml'
   }
 }
-
-// forces sonarqube to execute integration tests
-project.tasks["sonarqube"].dependsOn "pmdMain"
-project.tasks["sonarqube"].dependsOn "pmdTest"
-project.tasks["sonarqube"].dependsOn "check"
-
-project.tasks["sonarqube"].dependsOn "reportScoverage"
-project.tasks["sonarqube"].dependsOn "checkScoverage"
