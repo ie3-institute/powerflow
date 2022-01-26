@@ -16,6 +16,8 @@ ext {
   scalaVersion = '2.13'
   scalaBinaryVersion = '2.13.7'
 
+  scapegoatVersion = '1.4.12'
+
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
 }
 
@@ -51,12 +53,11 @@ dependencies {
   // TEST Scala //
   testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.11"
   testImplementation 'com.vladsch.flexmark:flexmark-all:0.62.2'
-  testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.11"
   testImplementation "org.pegdown:pegdown:1.6.0" // HTML report for scalatest
 
   // Linter Scala //
-  implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:1.4.12" // scala scapegoat
-  scalaCompilerPlugin "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:1.4.11" // scala scapegoat
+  implementation "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}" // scala scapegoat
+  scalaCompilerPlugin "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}" // scala scapegoat
 
   // logging //
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.4" // akka scala logging
