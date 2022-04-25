@@ -51,7 +51,7 @@ dependencies {
   implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
 
   // TEST Scala //
-  testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.11"
+  testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.12"
   testImplementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
   testImplementation "org.pegdown:pegdown:1.6.0" // HTML report for scalatest
 
