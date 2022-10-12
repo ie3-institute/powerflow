@@ -38,8 +38,8 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
           ) > testTolerance
         )
           logger.debug(s"Mismatch in (${rowIdx}, ${colIdx}): Actual = ${actual
-            .valueAt(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix
-            .valueAt(rowIdx, colIdx)}")
+              .valueAt(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix
+              .valueAt(rowIdx, colIdx)}")
       }
 
       val toleranceRespected =
