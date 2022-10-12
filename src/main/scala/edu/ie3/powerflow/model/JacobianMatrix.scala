@@ -127,7 +127,7 @@ case object JacobianMatrix {
     * To represent the correct linearised equations of the grid, several rows
     * and columns have to be deleted: 1) The columns at the position of the
     * slack node 2) In all submatrices => The row of the slack node 3) In dQd*
-    * => The rows of the voltage regulated nodes (PV nodes) 4) In dV2d* => The
+    * \=> The rows of the voltage regulated nodes (PV nodes) 4) In dV2d* => The
     * rows of the nodes with fixed power (PQ nodes)
     *
     * @param matrix

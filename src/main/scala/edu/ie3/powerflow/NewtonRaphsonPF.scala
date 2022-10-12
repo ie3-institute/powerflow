@@ -42,9 +42,9 @@ import scala.util.{Failure, Success}
   * possible to detect all logical failures.
   *
   * @param epsilon
-  *   Permissible deviation between actual (given) use of the grid (P, Q,
-  * |V|) and those values determined during iterative solving of the system of
-  * equations
+  *   Permissible deviation between actual (given) use of the grid (P, Q, |V|)
+  *   and those values determined during iterative solving of the system of
+  *   equations
   * @param maxIterations
   *   Maximum amount of iterations
   * @param admittanceMatrix
