@@ -61,7 +61,7 @@ dependencies {
 
   // logging //
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
-  implementation "ch.qos.logback:logback-classic:1.4.1"
+  implementation "ch.qos.logback:logback-classic:1.4.4"
 
   implementation('com.github.ie3-institute:PowerSystemUtils:1.6') {
     exclude group: 'org.apache.logging.log4j'
