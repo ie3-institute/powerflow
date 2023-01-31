@@ -22,7 +22,7 @@ ext {
 }
 
 group = 'com.github.ie3-institute'
-version = '0.2'
+version = '1.0-SNAPSHOT'
 description = 'powerflow'
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
