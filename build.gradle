@@ -39,11 +39,7 @@ configurations {
 }
 
 repositories {
-  //searches in Maven Central
   mavenCentral()
-
-  // allows github repos as dependencies
-  maven { url 'https://www.jitpack.io' }
 }
 
 dependencies {
@@ -63,6 +59,7 @@ dependencies {
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
   implementation "ch.qos.logback:logback-classic:1.4.5"
 
+  // used for ArrayHelper
   implementation('com.github.ie3-institute:PowerSystemUtils:2.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
