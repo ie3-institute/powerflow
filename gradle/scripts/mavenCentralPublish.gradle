@@ -48,40 +48,17 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
               name = 'BSD 3-Clause License'
               url = 'https:github.com/ie3-institute/powerflow/blob/master/LICENSE'
             }
-            scm {
-              connection = 'scm:git:git:github.com/ie3-institute/powerflow.git'
-              developerConnection = 'scm:git:ssh:github.com:ie3-institute/powerflow.git'
-              url = 'https:github.com/ie3-institute/powerflow'
+          }
+          developers {
+            developer {
+              organization = "Institute of Energy Systems, Energy Efficiency and Energy Economics (ie3)/TU Dortmund University"
+              organizationUrl = "https:ie3.etit.tu-dortmund.de"
             }
-            developers {
-              [
-                developer {
-                  id = 'johanneshiry'
-                  name = 'Johannes Hiry'
-                  email = 'johannes.hiry@tu-dortmund.de'
-                },
-                developer {
-                  id = 'ckittl'
-                  name = 'Chris Kittl'
-                  email = 'chris.kittl@tu-dortmund.de'
-                },
-                developer {
-                  id = 'sensarmad'
-                  name = 'Debopama Sen Sarma'
-                  email = 'debopama-sen.sarma@tu-dortmund.de'
-                },
-                developer {
-                  id = 't-ober'
-                  name = 'Thomas Oberließen'
-                  email = 'thomas.oberließen@tu-dortmund.de'
-                },
-                developer {
-                  id = 'sebastian-peter'
-                  name = 'Sebastian Peter'
-                  email = 'sebastian.peter@tu-dortmund.de'
-                }
-              ]
-            }
+          }
+          scm {
+            connection = 'scm:git:git:github.com/ie3-institute/powerflow.git'
+            developerConnection = 'scm:git:ssh:github.com:ie3-institute/powerflow.git'
+            url = 'https:github.com/ie3-institute/powerflow'
           }
         }
 
@@ -98,8 +75,8 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
     }
     repositories {
       maven {
-        def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-        def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+        def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+        def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
         url = this.version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
         credentials {
           username project.getProperty('user')
