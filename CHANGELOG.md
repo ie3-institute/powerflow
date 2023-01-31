@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
+## [0.2]
+
+### Changed
+- Various updates to CI
+- Updated dependencies
+
 ## [0.1]
 ### Added
 - Initial project structure and code
@@ -18,5 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Spock testing framework
 
-[Unreleased / Snapshot]: https://github.com/ie3-institute/powerflowcompare/0.1...HEAD
+[Unreleased / Snapshot]: https://github.com/ie3-institute/powerflow/compare/0.2...HEAD
+[0.2]: https://github.com/ie3-institute/powerflow/compare/0.1...0.2
 [0.1]: https://github.com/ie3-institute/powerflow/releases/tag/0.1
