@@ -130,7 +130,6 @@ if (env.BRANCH_NAME == "main") {
               // call codecov
               sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN} -C ' + commitHash
             }
-
           }
 
           // deploy snapshot version to oss sonatype
@@ -144,10 +143,8 @@ if (env.BRANCH_NAME == "main") {
               deployGradleTasks = '--refresh-dependencies clean check publish -Puser=${MAVENCENTRAL_USER} -Ppassword=${MAVENCENTRAL_PASS} -Psigning.keyId=${MAVENCENTRAL_SIGNINGKEYID} -Psigning.password=${MAVENCENTRAL_SIGNINGPASS} -Psigning.secretKeyRingFile=${MAVENCENTRAL_KEYFILE}'
 
               gradle(deployGradleTasks)
-
             }
           }
-
         } catch (Exception e) {
           // set build result to failure
           currentBuild.result = 'FAILURE'
@@ -158,14 +155,9 @@ if (env.BRANCH_NAME == "main") {
           // print exception
           Date date = new Date()
           println("[ERROR] [${date.format("dd/MM/yyyy")} - ${date.format("HH:mm:ss")}]" + e)
-
         }
-
       }
-
     }
-
-
   } else {
     // merge of features
     node {
@@ -262,7 +254,6 @@ if (env.BRANCH_NAME == "main") {
           // print exception
           Date date = new Date()
           println("[ERROR] [${date.format("dd/MM/yyyy")} - ${date.format("HH:mm:ss")}]" + e)
-
         }
       }
     }
