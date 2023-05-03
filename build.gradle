@@ -55,7 +55,7 @@ dependencies {
 
   // TEST Scala //
   testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.15"
-  testImplementation 'com.vladsch.flexmark:flexmark-all:0.64.0'
+  testImplementation 'com.vladsch.flexmark:flexmark-all:0.64.4'
   testImplementation "org.pegdown:pegdown:1.6.0" // HTML report for scalatest
 
   // Linter Scala //
