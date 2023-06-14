@@ -14,7 +14,7 @@ plugins {
 ext {
   javaVersion = JavaVersion.VERSION_17
   scalaVersion = '2.13'
-  scalaBinaryVersion = '2.13.8'
+  scalaBinaryVersion = '2.13.11'
 
   scapegoatVersion = '1.4.17'
 
