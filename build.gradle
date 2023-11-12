@@ -135,5 +135,6 @@ tasks {
   test {
     // Solution for :compileScoverageGroovy
     dependsOn compileScoverageGroovy  // or mustRunAfter compileScoverageGroovy
+    dependsOn processScoverageResources
   }
 }
