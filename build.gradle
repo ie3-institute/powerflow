@@ -130,3 +130,10 @@ tasks.withType(ScalaCompile) {
     '-XX:MaxInlineLevel=20'
   ]
 }
+
+tasks {
+  test {
+    // Solution for :compileScoverageGroovy
+    dependsOn compileScoverageGroovy  // or mustRunAfter compileScoverageGroovy
+  }
+}
