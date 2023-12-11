@@ -25,8 +25,6 @@ urls = [
 
 def sonarqubeProjectKey = "edu.ie3:powerflow"
 
-/// code coverage token id
-codeCovTokenId = "powerflow-codecov-token"
 
 //// internal jenkins credentials link for git ssh keys
 //// requires the ssh key to be stored in the internal jenkins credentials keystore
@@ -122,14 +120,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports()
-
-            // inform codecov.io
-            withCredentials([
-              string(credentialsId: codeCovTokenId, variable: 'CODECOV_TOKEN')
-            ]) {
-              // call codecov
-              sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN} -C ' + commitHash
-            }
           }
 
           // deploy snapshot version to oss sonatype
@@ -220,14 +210,6 @@ if (env.BRANCH_NAME == "main") {
           stage('publish reports + coverage') {
             // publish reports
             publishReports()
-
-            // inform codecov.io
-            withCredentials([
-              string(credentialsId: codeCovTokenId, variable: 'CODECOV_TOKEN')
-            ]) {
-              // call codecov
-              sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN} -C ' + commitHash
-            }
           }
 
 
@@ -333,13 +315,6 @@ if (env.BRANCH_NAME == "main") {
         stage('publish reports + coverage') {
           // publish reports
           publishReports()
-
-          withCredentials([
-            string(credentialsId: codeCovTokenId, variable: 'CODECOV_TOKEN')
-          ]) {
-            // call codecov
-            sh 'curl -s https://codecov.io/bash | bash -s - -t ${CODECOV_TOKEN} -C ' + commitHash
-          }
         }
       } catch (Exception e) {
         // set build result to failure
