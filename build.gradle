@@ -67,7 +67,7 @@ dependencies {
   implementation "ch.qos.logback:logback-classic:1.5.2"
 
   // used for ArrayHelper
-  implementation('com.github.ie3-institute:PowerSystemUtils:2.2') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:2.2.1') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
