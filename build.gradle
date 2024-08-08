@@ -76,7 +76,7 @@ dependencies {
 
   implementation 'com.googlecode.matrix-toolkits-java:mtj:1.0.4' // matrix data structures
   implementation 'org.apache.commons:commons-math3:3.6.1'
-  implementation 'org.apache.commons:commons-lang3:3.15.0' // for HashCodeBuilder
+  implementation 'org.apache.commons:commons-lang3:3.16.0' // for HashCodeBuilder
   implementation 'javax.measure:unit-api:2.2'
   implementation 'org.scalanlp:breeze_2.13:2.1.0' // Scientific calculations
 }
