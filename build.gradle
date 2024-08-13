@@ -91,7 +91,7 @@ dependencies {
 compileScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
-    "-P:scapegoat:dataDir:" + layout.buildDirectory.dir("reports/scapegoat/src/"),
+    "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:VariableShadowing",
     "-P:scapegoat:ignoredFiles:.*/PowerFactoryGrid.scala" // see scapegoat-sbt page for this param
   ]
