@@ -24,8 +24,10 @@ ext {
 group = 'com.github.ie3-institute'
 version = '1.0-SNAPSHOT'
 description = 'powerflow'
-sourceCompatibility = javaVersion
-targetCompatibility = javaVersion
+java {
+  sourceCompatibility = javaVersion
+  targetCompatibility = javaVersion
+}
 
 apply from: scriptsLocation + '/checkJavaVersion.gradle'
 apply from: scriptsLocation + '/spotless.gradle'
@@ -89,7 +91,7 @@ dependencies {
 compileScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
-    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/src/",
+    "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:VariableShadowing",
     "-P:scapegoat:ignoredFiles:.*/PowerFactoryGrid.scala" // see scapegoat-sbt page for this param
   ]
@@ -99,7 +101,7 @@ compileScala {
 compileTestScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
-    "-P:scapegoat:dataDir:" + buildDir + "/reports/scapegoat/testsrc/",
+    "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
     "-P:scapegoat:disabledInspections:VariableShadowing"
   ]
 }
@@ -127,4 +129,12 @@ tasks.withType(ScalaCompile) {
     '-XX:+UseParallelGC',
     '-XX:MaxInlineLevel=20'
   ]
+}
+
+tasks {
+  test {
+    // Solution for :compileScoverageGroovy
+    dependsOn compileScoverageGroovy  // or mustRunAfter compileScoverageGroovy
+    dependsOn processScoverageResources
+  }
 }
