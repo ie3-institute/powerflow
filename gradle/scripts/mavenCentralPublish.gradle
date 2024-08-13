@@ -88,10 +88,9 @@ if (project.hasProperty('user') && project.hasProperty('password')) {
 
   model {
     tasks.generatePomFileForMavenJavaPublication {
-      destination = file("$rootDir/build/generated-pom.xml")
+      destination = file("${layout.buildDirectory.dir}/generated-pom.xml")
     }
-  }
-}
+  }}
 
 def removeTestDependenciesFromPom(pom) {
 
