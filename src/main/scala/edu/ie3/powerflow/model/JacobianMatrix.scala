@@ -120,9 +120,7 @@ case object JacobianMatrix {
   /** Finally build the jacobian matrix based on the sub matrices of partial
     * deviations. The final form is:
     *
-    * dPdF | dPdE
-    * ------------- dQdF | dQdF
-    * ------------- dV2dF | dV2dE
+    * dPdF | dPdE ------------- dQdF | dQdF ------------- dV2dF | dV2dE
     *
     * To represent the correct linearised equations of the grid, several rows
     * and columns have to be deleted: 1) The columns at the position of the
