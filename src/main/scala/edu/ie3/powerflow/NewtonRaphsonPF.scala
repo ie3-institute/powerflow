@@ -188,12 +188,10 @@ final case class NewtonRaphsonPF(
 case object NewtonRaphsonPF extends LazyLogging {
 
   /** Determine initial state of the grid 1) If start data has been provided and
-    * if it is a
-    * 1.1.1) forced start vector of voltages --> Take them
-    * 1.1.2) only the voltage at the slack node is provided --> Do a flat start
-    * with the given slack voltage
-    * 1.2) last known state --> Determine the start vector 2) If nothing has
-    * been given --> flat start
+    * if it is a 1.1.1) forced start vector of voltages --> Take them 1.1.2)
+    * only the voltage at the slack node is provided --> Do a flat start with
+    * the given slack voltage 1.2) last known state --> Determine the start
+    * vector 2) If nothing has been given --> flat start
     *
     * NOTE: if 1.1.2) holds true, the provided [[PresetData.targetVoltage]] of
     * the provided operation point for the slack node will be overwritten!
