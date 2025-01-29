@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Various updates to CI
 - Updated dependencies
 - Updating to gradle 8.9 [#136](https://github.com/ie3-institute/powerflow/issues/136)
+- Fix spotless deprecations [#197](https://github.com/ie3-institute/powerflow/issues/197)
 
 ## [0.1]
 ### Added
