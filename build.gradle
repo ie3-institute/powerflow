@@ -66,7 +66,7 @@ dependencies {
 
   // logging //
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
-  implementation "ch.qos.logback:logback-classic:1.5.16"
+  implementation "ch.qos.logback:logback-classic:1.5.17"
 
   // used for ArrayHelper
   implementation('com.github.ie3-institute:PowerSystemUtils:2.2.1') {
