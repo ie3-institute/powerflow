@@ -306,7 +306,7 @@ case object NewtonRaphsonPF extends LazyLogging {
     val v = StateData.extractVoltageVector(state)
     val nodalPower = v *:* (admittanceMatrix * v).map(i => i.conjugate)
     (state zip nodalPower.toScalaVector).map(stateAndPowerPair =>
-      stateAndPowerPair._1.copy(power = -1 * stateAndPowerPair._2)
+      stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
     )
   }
 
