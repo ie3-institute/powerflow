@@ -14,7 +14,7 @@ plugins {
 ext {
   javaVersion = JavaVersion.VERSION_17
   scalaVersion = '3'
-  scalaBinaryVersion = '3.6.2'
+  scalaBinaryVersion = '3.6.4'
 
   scapegoatVersion = '3.1.7'
 
@@ -53,7 +53,7 @@ dependencies {
   }
 
   // CORE Scala //
-  implementation "org.scala-lang:scala3-library_${scalaVersion}:${scalaBinaryVersion}"
+  implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
 
   // TEST Scala //
   testImplementation "org.scalatest:scalatest_${scalaVersion}:3.2.15"
@@ -69,7 +69,7 @@ dependencies {
   implementation "ch.qos.logback:logback-classic:1.5.18"
 
   // used for ArrayHelper
-  implementation('com.github.ie3-institute:PowerSystemUtils:2.2.1') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:3.0.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
@@ -90,6 +90,7 @@ dependencies {
  */
 compileScala {
   scalaCompileOptions.additionalParameters = [
+    "-print-tasty",
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:VariableShadowing",
@@ -100,6 +101,7 @@ compileScala {
 // separate scapegoat report for test classes
 compileTestScala {
   scalaCompileOptions.additionalParameters = [
+    "-print-tasty",
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
     "-P:scapegoat:disabledInspections:VariableShadowing"
