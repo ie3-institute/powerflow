@@ -4,7 +4,7 @@ plugins {
   id 'scala' // scala support
   id 'pmd' //code check, working on source code
   id 'com.diffplug.spotless' version '7.0.2'//code format
-  id "org.sonarqube" version "6.0.1.5171" // sonarqube
+  id "org.sonarqube" version "6.1.0.5360" // sonarqube
   id 'org.scoverage' version '8.1' // Code coverage plugin for scala
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
   id 'maven-publish'
@@ -16,7 +16,7 @@ ext {
   scalaVersion = '3'
   scalaBinaryVersion = '3.6.2'
 
-  scapegoatVersion = '3.1.4'
+  scapegoatVersion = '3.1.7'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
 }
@@ -47,7 +47,7 @@ repositories {
 dependencies {
   constraints {
     // flexmark uses 1.14.3 with vulnerability
-    implementation( 'org.jsoup:jsoup:1.18.3' ){
+    implementation( 'org.jsoup:jsoup:1.19.1' ){
       because "CVE-2022-36033 6.1 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability pending CVSS allocation"
     }
   }
@@ -66,7 +66,7 @@ dependencies {
 
   // logging //
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
-  implementation "ch.qos.logback:logback-classic:1.5.16"
+  implementation "ch.qos.logback:logback-classic:1.5.18"
 
   // used for ArrayHelper
   implementation('com.github.ie3-institute:PowerSystemUtils:2.2.1') {
