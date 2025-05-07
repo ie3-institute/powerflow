@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added Bao and Staudt to list of reviewers [#188](https://github.com/ie3-institute/powerflow/issues/188)
+- Added semantic Versioning plugin to gradle [#218](https://github.com/ie3-institute/powerflow/issues/218)
 
 ## [0.2]
 
