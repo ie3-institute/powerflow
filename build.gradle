@@ -46,12 +46,6 @@ repositories {
 }
 
 dependencies {
-  constraints {
-    // flexmark uses 1.14.3 with vulnerability
-    implementation( 'org.jsoup:jsoup:1.19.1' ){
-      because "CVE-2022-36033 6.1 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability pending CVSS allocation"
-    }
-  }
 
   // CORE Scala //
   implementation "org.scala-lang:scala-library:${scalaBinaryVersion}"
