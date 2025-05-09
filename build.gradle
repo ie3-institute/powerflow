@@ -60,11 +60,11 @@ dependencies {
   scalaCompilerPlugin "com.sksamuel.scapegoat:scalac-scapegoat-plugin_${scalaBinaryVersion}:${scapegoatVersion}" // scala scapegoat
 
   // logging //
-  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // akka scala logging
+  implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.5" // pekko scala logging
   implementation "ch.qos.logback:logback-classic:1.5.18"
 
   // used for ArrayHelper
-  implementation('com.github.ie3-institute:PowerSystemUtils:3.0.0') {
+  implementation('com.github.ie3-institute:PowerSystemUtils:3.1.0') {
     exclude group: 'org.apache.logging.log4j'
     exclude group: 'org.slf4j'
     /* Exclude our own nested dependencies */
@@ -85,7 +85,6 @@ dependencies {
  */
 compileScala {
   scalaCompileOptions.additionalParameters = [
-    "-print-tasty",
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:VariableShadowing",
@@ -96,7 +95,6 @@ compileScala {
 // separate scapegoat report for test classes
 compileTestScala {
   scalaCompileOptions.additionalParameters = [
-    "-print-tasty",
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
     "-P:scapegoat:disabledInspections:VariableShadowing"
