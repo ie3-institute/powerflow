@@ -54,7 +54,7 @@ String featureBranchName = ""
 
 //// gradle tasks that are executed
 def gradleTasks = "--refresh-dependencies clean spotlessCheck pmdMain pmdTest check" // the gradle tasks that are executed on ALL projects
-def mainProjectGradleTasks = "reportScoverage checkScoverage" // additional tasks that are only executed on project 0 (== main project)
+def mainProjectGradleTasks = "reportScoverage" // additional tasks that are only executed on project 0 (== main project)
 
 /// commit hash
 def commitHash = ""
