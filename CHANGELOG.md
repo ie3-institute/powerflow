@@ -15,8 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Removed
 - Removed dependency constraint [#221](https://github.com/ie3-institute/powerflow/issues/221)
 
-### Changed
+### Updates
 - Upgraded to `scala3` [#204](https://github.com/ie3-institute/powerflow/issues/204)
+- Bumping gradle to 8.14
 
 ## [0.2]
 
