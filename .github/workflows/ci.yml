@@ -52,17 +52,15 @@ jobs:
           fi
           
           export BRANCH_NAME
-          
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
           
-          ./gradlew checkBranchName -PbranchName="$BRANCH_NAME" --warning-mode=none
-          
           bash scripts/branch_type.sh
+
       - name: Version Check
         if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
-        run: bash scripts/run-version-check.sh
+        run: bash scripts/run_version_check.sh
 
       - name: Build Project
         run: ./gradlew --refresh-dependencies clean assemble spotlessCheck

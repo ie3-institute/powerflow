@@ -29,7 +29,7 @@ elif [[ "$BRANCH_NAME" =~ $pattern_main ]]; then
 elif [[ "$BRANCH_NAME" =~ $pattern_feature ]]; then
   BRANCH_TYPE="feature"
 else
-  echo "Error:'$BRANCH_NAME' does not match any pattern."
+  echo "Error: Check branch name format (e.g., ps/#1337-FeatureName). Current branch name is '$BRANCH_NAME'."
   exit 1
 fi
 
