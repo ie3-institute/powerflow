@@ -77,3 +77,16 @@ jobs:
           -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.qualitygate.wait=true
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVENCENTRAL_SIGNINGKEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVENCENTRAL_SIGNINGPASS }}
+          ORG_GRADLE_PROJECT_user: ${{ secrets.MAVENCENTRAL_USER }}
+          ORG_GRADLE_PROJECT_password: ${{ secrets.MAVENCENTRAL_PASS }}
+        run: |
+          currentVersion=$(./gradlew -q devVersion)            
+          echo "currentVersion=$currentVersion"
+            
+          ./gradlew publish -PdeployVersion=$currentVersion
