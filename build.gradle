@@ -35,7 +35,6 @@ apply from: scriptsLocation + '/pmd.gradle'
 apply from: scriptsLocation + '/scoverage.gradle'
 apply from: scriptsLocation + '/sonarqube.gradle'
 apply from: scriptsLocation + '/mavenCentralPublish.gradle'
-apply from: scriptsLocation + '/branchName.gradle'
 apply from: scriptsLocation + '/semVer.gradle'
 
 configurations {
