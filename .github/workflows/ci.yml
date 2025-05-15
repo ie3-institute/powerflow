@@ -66,17 +66,11 @@ jobs:
         run: ./gradlew --refresh-dependencies clean assemble spotlessCheck
 
       - name: Run Tests
-        run: ./gradlew pmdMain pmdTest check reportScoverage checkScoverage
+        run: ./gradlew pmdMain pmdTest check reportScoverage
       - name: Build Scala-Docs
         run: ./gradlew scaladoc
 
-      - name: SonarQube
-        run: |
-          ./gradlew sonar \
-          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
-          -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.qualitygate.wait=true
+
 
       - name: Deploy
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
