@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
+### Added
+- Added dependabot workflow and `CODEOWNERS` [#229](https://github.com/ie3-institute/powerflow/issues/229)
+
 ## [0.3]
 
 ### Added
