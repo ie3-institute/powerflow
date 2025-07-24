@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added dependabot workflow and `CODEOWNERS` [#229](https://github.com/ie3-institute/powerflow/issues/229)
 
+### Changed
+- Removed Jenkins due to redundancy with GHA [#237](https://github.com/ie3-institute/powerflow/issues/237)
+
 ## [0.3]
 
 ### Added
