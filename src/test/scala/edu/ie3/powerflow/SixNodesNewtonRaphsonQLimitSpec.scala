@@ -39,7 +39,7 @@ class SixNodesNewtonRaphsonQLimitSpec extends UnitSpec with SixNodesTestData {
             ) < finalResultTolerance && abs(
               actual.power.imag - expected.power.imag
             ) < finalResultTolerance
-            if (!result) {
+            if !result then {
               logger.error(
                 s"Mismatch in final result of node {${actual.index}}: actual(v = ${actual.voltage}, " +
                   s"s = ${actual.power}) vs. expected(v = ${expected.voltage}, s = ${expected.power})"

@@ -36,7 +36,7 @@ final case class JacobianMatrix(
     dQdF: DenseMatrix[Double],
     dQdE: DenseMatrix[Double],
     dV2dF: DenseMatrix[Double],
-    dV2dE: DenseMatrix[Double]
+    dV2dE: DenseMatrix[Double],
 )
 
 case object JacobianMatrix {
@@ -47,7 +47,7 @@ case object JacobianMatrix {
       DenseMatrix.zeros(nodeAmount, nodeAmount),
       DenseMatrix.zeros(nodeAmount, nodeAmount),
       DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount)
+      DenseMatrix.zeros(nodeAmount, nodeAmount),
     )
   }
 
@@ -61,16 +61,16 @@ case object JacobianMatrix {
     */
   def buildJacobianMatrix(
       lastState: Array[StateData],
-      admittanceMatrix: DenseMatrix[Complex]
+      admittanceMatrix: DenseMatrix[Complex],
   ): DenseMatrix[Double] = {
     val voltages = StateData.extractVoltageVector(lastState)
     val nodeCount = admittanceMatrix.rows
     val fullMatrix = JacobianMatrix(nodeCount)
 
-    for (
+    for
       row <- 0 until nodeCount; rowType = lastState(row).nodeType;
       col <- 0 until nodeCount
-    ) {
+    do {
       rowType match {
         case NodeType.PQ | NodeType.PQ_INTERMEDIATE | NodeType.PV =>
           val gij = admittanceMatrix.valueAt(row, col).real
@@ -79,7 +79,7 @@ case object JacobianMatrix {
           val ej = voltages(col).real
           val fi = voltages(row).imag
           val fj = voltages(col).imag
-          if (row == col) {
+          if row == col then {
             fullMatrix.dPdF(row, col) += 2 * fi * gij // dPi/dfi
             fullMatrix.dPdE(row, col) += 2 * ei * gij // dPi/dei
             fullMatrix.dQdF(row, col) += -2 * fi * bij // dQi/dfi
@@ -143,24 +143,24 @@ case object JacobianMatrix {
       matrix: JacobianMatrix,
       slIdx: IndexedSeq[Int],
       pqIdx: IndexedSeq[Int],
-      pvIdx: IndexedSeq[Int]
+      pvIdx: IndexedSeq[Int],
   ): DenseMatrix[Double] = {
     val dP = DenseMatrix
       .horzcat(
         matrix.dPdF.delete(slIdx, Axis._1),
-        matrix.dPdE.delete(slIdx, Axis._1)
+        matrix.dPdE.delete(slIdx, Axis._1),
       )
       .delete(slIdx, Axis._0)
     val dQ = DenseMatrix
       .horzcat(
         matrix.dQdF.delete(slIdx, Axis._1),
-        matrix.dQdE.delete(slIdx, Axis._1)
+        matrix.dQdE.delete(slIdx, Axis._1),
       )
       .delete(slIdx ++ pvIdx, Axis._0)
     val dV2 = DenseMatrix
       .horzcat(
         matrix.dV2dF.delete(slIdx, Axis._1),
-        matrix.dV2dE.delete(slIdx, Axis._1)
+        matrix.dV2dE.delete(slIdx, Axis._1),
       )
       .delete(slIdx ++ pqIdx, Axis._0)
 
@@ -174,7 +174,7 @@ case object JacobianMatrix {
       case _ =>
         DenseMatrix.vertcat(
           DenseMatrix.vertcat(dP, dQ),
-          dV2
+          dV2,
         )
     }
   }

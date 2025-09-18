@@ -52,7 +52,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
         PresetData(3, NodeType.PV, Complex(5, 0)), /* Node 3 */
         PresetData(5, NodeType.PQ, Complex(5, 0)), /* Node 5 */
         PresetData(2, NodeType.PQ, Complex(5, 0)), /* Node 2 */
-        PresetData(4, NodeType.PV, Complex(5, 0)) /* Node 4 */
+        PresetData(4, NodeType.PV, Complex(5, 0)), /* Node 4 */
       )
 
       val actual = NodeData.correctOrder(operationPoint, intendedOrder)
@@ -69,7 +69,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
         Complex(5.0, 0.0),
         Complex(5.0, 0.0),
         Complex(5.0, 0.0),
-        Complex(5.0, 0.0)
+        Complex(5.0, 0.0),
       )
       val actual = PresetData.extractPowerVector(operationPoint)
 
@@ -85,7 +85,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
         Complex(0.975, 0.0),
         Complex.one,
         Complex.one,
-        Complex(0.95, 0.0)
+        Complex(0.95, 0.0),
       )
       val actual = StateData.extractVoltageVector(lastState)
 
@@ -99,7 +99,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
         Complex(5.0, 0.0),
         Complex(5.0, 0.0),
         Complex(5.0, 0.0),
-        Complex(5.0, 0.0)
+        Complex(5.0, 0.0),
       )
       val actual = StateData.extractPowerVector(lastState)
 

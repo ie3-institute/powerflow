@@ -12,20 +12,20 @@ import breeze.numerics.{abs, pow}
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.powerflow.model.FailureCause.{
   CalculationFailed,
-  MaxIterationsReached
+  MaxIterationsReached,
 }
 import edu.ie3.powerflow.model.NodeData.{DeviationData, PresetData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.StartData.{
   WithForcedStartVoltages,
-  WithLastState
+  WithLastState,
 }
 import edu.ie3.powerflow.model.{
   JacobianMatrix,
   NodeData,
   PowerFlowResult,
-  StartData
+  StartData,
 }
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
@@ -58,9 +58,9 @@ final case class NewtonRaphsonPF(
     epsilon: Double,
     maxIterations: Integer,
     admittanceMatrix: DenseMatrix[Complex],
-    intendedIndexOrder: Option[Vector[Int]] = None
+    intendedIndexOrder: Option[Vector[Int]] = None,
 ) extends LazyLogging {
-  if (admittanceMatrix.rows != admittanceMatrix.cols)
+  if admittanceMatrix.rows != admittanceMatrix.cols then
     throw new PowerFlowException("Have a square matrix ready!")
   intendedIndexOrder match {
     case Some(intendedOrder) if intendedOrder.length != admittanceMatrix.cols =>
@@ -93,7 +93,7 @@ final case class NewtonRaphsonPF(
     */
   def calculate(
       operationPointUnordered: Array[PresetData],
-      initData: Option[StartData] = None
+      initData: Option[StartData] = None,
   ): PowerFlowResult = {
     val operationPoint =
       NodeData.correctOrder(operationPointUnordered, intendedIndexOrder)
@@ -121,7 +121,7 @@ final case class NewtonRaphsonPF(
   private def solveIterationStepsRecursively(
       iterationCount: Integer = 0,
       operationPoint: Array[PresetData],
-      lastState: Array[StateData]
+      lastState: Array[StateData],
   ): PowerFlowResult = {
     /* calculate nodal voltage magnitude and apparent power deviation */
     val lastStateWithIterationPower = NewtonRaphsonPF
@@ -136,7 +136,7 @@ final case class NewtonRaphsonPF(
       NewtonRaphsonPF.calculateDeviationToActualState(
         intermediateOperationPoint,
         iterationVoltage,
-        iterationPower
+        iterationPower,
       )
     val deviationVector =
       NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation)
@@ -144,13 +144,13 @@ final case class NewtonRaphsonPF(
     val jacobianMatrix =
       JacobianMatrix.buildJacobianMatrix(
         lastStateWithIterationPower,
-        admittanceMatrix
+        admittanceMatrix,
       )
 
     NewtonRaphsonPF.correctVoltages(
       lastStateWithIterationPower,
       deviationVector,
-      jacobianMatrix
+      jacobianMatrix,
     ) match {
       case Some(correctedState) if converged =>
         logger.debug(
@@ -159,14 +159,14 @@ final case class NewtonRaphsonPF(
         ValidNewtonRaphsonPFResult(
           iterationCount,
           correctedState,
-          jacobianMatrix
+          jacobianMatrix,
         )
       case Some(correctedState)
           if !converged && iterationCount < maxIterations =>
         solveIterationStepsRecursively(
           iterationCount + 1,
           operationPoint,
-          correctedState
+          correctedState,
         )
       case Some(_) if !converged & iterationCount >= maxIterations =>
         logger.debug(
@@ -206,7 +206,7 @@ case object NewtonRaphsonPF extends LazyLogging {
     */
   def getInitialState(
       operationPoint: Array[PresetData],
-      initData: Option[StartData]
+      initData: Option[StartData],
   ): Array[StateData] = {
     val nodeCount = operationPoint.length
 
@@ -219,7 +219,7 @@ case object NewtonRaphsonPF extends LazyLogging {
         val slState = forcedState(0)
         val candidateOperationPoint =
           NodeData.getByIndex(operationPoint, slState.index)
-        if (candidateOperationPoint.nodeType != NodeType.SL)
+        if candidateOperationPoint.nodeType != NodeType.SL then
           throw new PowerFlowException(
             s"Received a forced start voltage for slack node at index" +
               s"${slState.index}, but the operation point at that index is no slack node."
@@ -243,11 +243,10 @@ case object NewtonRaphsonPF extends LazyLogging {
         )
 
       case Some(WithLastState(lastState, slVoltage, jacobianMatrix)) =>
-        if (
-          jacobianMatrix.cols != (2 * nodeCount - 2) ||
+        if jacobianMatrix.cols != (2 * nodeCount - 2) ||
           jacobianMatrix.rows != (2 * nodeCount - 2) ||
           lastState.length != nodeCount
-        ) {
+        then {
           throw new PowerFlowException(
             s"A jacobian matrix and last known power vector has " +
               s"been provided with wrong dimension. Expected: $nodeCount, actual: " +
@@ -271,7 +270,7 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deviationToLastState = calculateDeviationToActualState(
           intermediateOperationPoint,
           lastStateVoltages,
-          lastStatePower
+          lastStatePower,
         )
         val deviationVector =
           NewtonRaphsonPF.buildCombinedDeviationVector(deviationToLastState)
@@ -279,7 +278,7 @@ case object NewtonRaphsonPF extends LazyLogging {
           NewtonRaphsonPF.correctVoltages(
             lastStateWithUpdatedSlackVoltage,
             deviationVector,
-            jacobianMatrix
+            jacobianMatrix,
           )
 
         correctedVoltagesOpt.getOrElse(operationPoint.map(op => StateData(op)))
@@ -301,7 +300,7 @@ case object NewtonRaphsonPF extends LazyLogging {
     */
   private def calculateIterationApparentPower(
       state: Array[StateData],
-      admittanceMatrix: DenseMatrix[Complex]
+      admittanceMatrix: DenseMatrix[Complex],
   ): Array[StateData] = {
     val v = StateData.extractVoltageVector(state)
     val nodalPower = v *:* (admittanceMatrix * v).map(i => i.conjugate)
@@ -324,14 +323,12 @@ case object NewtonRaphsonPF extends LazyLogging {
     */
   private def composeIntermediateOperationPoint(
       operationPoint: Array[PresetData],
-      iterationPower: DenseVector[Complex]
+      iterationPower: DenseVector[Complex],
   ): Option[Array[PresetData]] = {
-    if (
-      operationPoint.forall(node =>
+    if operationPoint.forall(node =>
         node.nodeType != NodeType.PV || (node.reactivePowerMin.isEmpty && node.reactivePowerMax.isEmpty)
       )
-    )
-      None
+    then None
     else {
       val intermediateOperationPoint =
         (operationPoint zip iterationPower.toScalaVector).map(
@@ -346,7 +343,7 @@ case object NewtonRaphsonPF extends LazyLogging {
                   nodeData.reactivePowerMin.getOrElse(Double.NegativeInfinity)
                 val qMax =
                   nodeData.reactivePowerMin.getOrElse(Double.PositiveInfinity)
-                if (power.imag * -1 < qMin) {
+                if power.imag * -1 < qMin then {
                   logger.warn(
                     s"Minimum reactive power limit violated at node ${nodeData.index} " +
                       s"(${power.imag * -1} < $qMin). Set to PQ node and limit reactive power."
@@ -354,9 +351,9 @@ case object NewtonRaphsonPF extends LazyLogging {
                   val newApparentPower = Complex(nodeData.power.real, qMin)
                   nodeData.copy(
                     nodeType = NodeType.PQ_INTERMEDIATE,
-                    power = newApparentPower
+                    power = newApparentPower,
                   )
-                } else if (power.imag * -1 > qMax) {
+                } else if power.imag * -1 > qMax then {
                   logger.warn(
                     s"Maximum reactive power limit violated at node ${nodeData.index} " +
                       s"(${power.imag * -1} > $qMin). Set to PQ node and limit reactive power."
@@ -364,10 +361,9 @@ case object NewtonRaphsonPF extends LazyLogging {
                   val newApparentPower = Complex(nodeData.power.real, qMax)
                   nodeData.copy(
                     nodeType = NodeType.PQ_INTERMEDIATE,
-                    power = newApparentPower
+                    power = newApparentPower,
                   )
-                } else
-                  nodeData
+                } else nodeData
               case _ => nodeData
             }
           }
@@ -393,7 +389,7 @@ case object NewtonRaphsonPF extends LazyLogging {
   private def calculateDeviationToActualState(
       operationPoint: Array[PresetData],
       iterationVoltages: DenseVector[Complex],
-      iterationPowers: DenseVector[Complex]
+      iterationPowers: DenseVector[Complex],
   ): Array[DeviationData] = {
     for (
       spec <- operationPoint;
@@ -406,14 +402,14 @@ case object NewtonRaphsonPF extends LazyLogging {
       val powerDeviation = actualPower - iterationPower
       val squaredVoltageMagnitudeDeviation = pow(iterationVoltage.abs, 2) - pow(
         spec.targetVoltage,
-        2
+        2,
       )
 
       DeviationData(
         index,
         nodeType,
         powerDeviation,
-        squaredVoltageMagnitudeDeviation
+        squaredVoltageMagnitudeDeviation,
       )
 
     }
@@ -439,13 +435,13 @@ case object NewtonRaphsonPF extends LazyLogging {
           (
             arrayTuple._1 :+ currentEntry.power.real,
             arrayTuple._2 :+ currentEntry.power.imag,
-            arrayTuple._3
+            arrayTuple._3,
           )
         case NodeType.PV =>
           (
             arrayTuple._1 :+ currentEntry.power.real,
             arrayTuple._2,
-            arrayTuple._3 :+ currentEntry.squaredVoltageMagnitude
+            arrayTuple._3 :+ currentEntry.squaredVoltageMagnitude,
           )
         case NodeType.SL => (arrayTuple._1, arrayTuple._2, arrayTuple._3)
       }
@@ -471,7 +467,7 @@ case object NewtonRaphsonPF extends LazyLogging {
   private def correctVoltages(
       lastState: Array[StateData],
       deviation: DenseVector[Double],
-      jacobianMatrix: DenseMatrix[Double]
+      jacobianMatrix: DenseMatrix[Double],
   ): Option[Array[StateData]] = {
     val nodeCount = lastState.length
 
@@ -499,14 +495,14 @@ case object NewtonRaphsonPF extends LazyLogging {
             .map(currentEntry => currentEntry._2)
         val indexToCorrection = indicesOfPVPQnodes zip correctionComplex
 
-        if (indexToCorrection.length != indicesOfPVPQnodes.length)
+        if indexToCorrection.length != indicesOfPVPQnodes.length then
           throw new PowerFlowException(
             s"Some correction values got lost. Found ${indicesOfPVPQnodes.length} nodes to correct," +
               s" but only ${indexToCorrection.length} matches."
           )
 
         val correctionFilledUp = DenseVector.zeros[Complex](nodeCount)
-        for (correctionPair <- indexToCorrection) {
+        for correctionPair <- indexToCorrection do {
           correctionFilledUp.update(correctionPair._1, correctionPair._2)
         }
         val newVoltages =

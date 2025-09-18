@@ -33,7 +33,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex(-687.74492, 560.26817),
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex(-458.49661, 373.51212),
@@ -41,7 +41,7 @@ trait SixNodesQLimitTestData {
       Complex(-343.87246, 280.13409),
       Complex.zero,
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex.zero,
@@ -49,7 +49,7 @@ trait SixNodesQLimitTestData {
       Complex(343.87246, -280.12759),
       Complex.zero,
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex(-687.74492, 560.26817),
@@ -57,7 +57,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex(2338.33273, -1904.89889),
       Complex(-1375.48984, 1120.53635),
-      Complex(-275.09797, 224.10727)
+      Complex(-275.09797, 224.10727),
     ),
     (
       Complex.zero,
@@ -65,7 +65,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex(-1375.48984, 1120.53635),
       Complex(1375.48984, -1120.53475),
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex.zero,
@@ -73,8 +73,8 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex(-275.09797, 224.10727),
       Complex.zero,
-      Complex(275.09797, -224.09917)
-    )
+      Complex(275.09797, -224.09917),
+    ),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows
@@ -88,16 +88,16 @@ trait SixNodesQLimitTestData {
       NodeType.PV,
       Complex(5, 0),
       reactivePowerMin = Some(7.5),
-      reactivePowerMax = Some(7.5)
+      reactivePowerMax = Some(7.5),
     ), /* Node 3 */
     PresetData(
       4,
       NodeType.PV,
       Complex(5, 0),
       reactivePowerMin = Some(-2.5),
-      reactivePowerMax = Some(2.5)
+      reactivePowerMax = Some(2.5),
     ), /* Node 4 */
-    PresetData(5, NodeType.PQ, Complex(5, 0)) /* Node 5 */
+    PresetData(5, NodeType.PQ, Complex(5, 0)), /* Node 5 */
   )
 
   protected val initialState: Array[StateData] =
@@ -109,31 +109,31 @@ trait SixNodesQLimitTestData {
       1,
       NodeType.PQ,
       Complex(0.986494045, -0.010680011),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.977422768, -0.017799289),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       3,
       NodeType.PV,
       Complex(0.993488408, -0.01942001),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       4,
       NodeType.PV,
       Complex(0.992118823, -0.02228457),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       5,
       NodeType.PQ,
       Complex(0.982114474, -0.028156108),
-      Complex(5.0, 0.0)
-    )
+      Complex(5.0, 0.0),
+    ),
   )
 }

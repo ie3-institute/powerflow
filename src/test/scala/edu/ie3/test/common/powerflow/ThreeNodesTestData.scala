@@ -27,25 +27,25 @@ trait ThreeNodesTestData {
     (
       Complex(1650.58781, -1344.63392),
       Complex(-1375.48984, 1120.53635),
-      Complex(-275.09797, 224.10727)
+      Complex(-275.09797, 224.10727),
     ),
     (
       Complex(-1375.48984, 1120.53635),
       Complex(1375.48984, -1120.53475),
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex(-275.09797, 224.10727),
       Complex.zero,
-      Complex(275.09797, -224.09917)
-    )
+      Complex(275.09797, -224.09917),
+    ),
   )
 
   protected val expectedJacobianMatrix: DenseMatrix[Double] = DenseMatrix(
     (1120.53635, 0.0, 1375.48984, 0.0),
     (0.0, 224.10727, 0.0, 275.09797),
     (-1375.48984, 0.0, 1120.53315, 0.0),
-    (0.0, -275.09797, 0.0, 224.09106999999997)
+    (0.0, -275.09797, 0.0, 224.09106999999997),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows
@@ -53,7 +53,7 @@ trait ThreeNodesTestData {
   protected val operationPoint: Array[PresetData] = Array(
     PresetData(0, NodeType.SL, Complex(0, 0)), /* Node 3 */
     PresetData(1, NodeType.PQ, Complex(5, 0)), /* Node 4 */
-    PresetData(2, NodeType.PQ, Complex(5, 0)) /* Node 5 */
+    PresetData(2, NodeType.PQ, Complex(5, 0)), /* Node 5 */
   )
 
   protected val initialState: Array[StateData] =
@@ -62,7 +62,7 @@ trait ThreeNodesTestData {
   protected val lastState = Array(
     StateData(0, NodeType.SL, Complex.one, Complex(5.0, 0.0)),
     StateData(1, NodeType.PQ, Complex(0.975, 0), Complex(5.0, 0.0)),
-    StateData(2, NodeType.PQ, Complex(0.95, 0), Complex(5.0, 0.0))
+    StateData(2, NodeType.PQ, Complex(0.95, 0), Complex(5.0, 0.0)),
   )
 
   protected val expectedNewState = Array(
@@ -71,14 +71,14 @@ trait ThreeNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.9971905667, -0.0017806957),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       1,
       NodeType.PQ,
       Complex(0.9865890674, -0.0089172679),
-      Complex(5.0, 0.0)
-    )
+      Complex(5.0, 0.0),
+    ),
   )
 
   protected val expectedLastStateWitIteratedPower = Array(
@@ -87,14 +87,14 @@ trait ThreeNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.975, 0),
-      Complex(33.52756485, 27.31459453)
+      Complex(33.52756485, 27.31459453),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.95, 0),
-      Complex(13.06715358, 10.65240558)
-    )
+      Complex(13.06715358, 10.65240558),
+    ),
   )
 
   protected val expectedDeviation: Array[DeviationData] = Array(
@@ -103,9 +103,9 @@ trait ThreeNodesTestData {
       1,
       NodeType.PQ,
       Complex(-28.52756485, -27.31459453),
-      -0.049375
+      -0.049375,
     ),
-    DeviationData(2, NodeType.PQ, Complex(-8.06715358, -10.65240558), -0.0975)
+    DeviationData(2, NodeType.PQ, Complex(-8.06715358, -10.65240558), -0.0975),
   )
 
   protected val expectedDeviationVector: DenseVector[Double] =
@@ -113,7 +113,7 @@ trait ThreeNodesTestData {
       -28.52756485,
       -8.06715358,
       -27.31459453,
-      -10.65240558
+      -10.65240558,
     )
 
   protected val expectedFinalState = Array(
@@ -122,13 +122,13 @@ trait ThreeNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.99780702, -0.00178000),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.98887201, -0.00890001),
-      Complex(5.0, 0.0)
-    )
+      Complex(5.0, 0.0),
+    ),
   )
 }
