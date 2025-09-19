@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Removed Jenkins due to redundancy with GHA [#237](https://github.com/ie3-institute/powerflow/issues/237)
 - Got rid of java implementation [#242](https://github.com/ie3-institute/powerflow/issues/242)
+- Introduce new deployment scripts [#250](https://github.com/ie3-institute/powerflow/issues/250)
 
 ### Update
 - Updating gradle to 9.1.0 [#248](https://github.com/ie3-institute/powerflow/issues/248)
