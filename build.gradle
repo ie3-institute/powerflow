@@ -1,8 +1,6 @@
 plugins {
-  id 'groovy' // groovy support
   id 'java' // java support
   id 'scala' // scala support
-  id 'pmd' //code check, working on source code
   id 'com.diffplug.spotless' version '7.2.1'//code format
   id "org.sonarqube" version "6.3.1.5724" // sonarqube
   id 'org.scoverage' version '8.1' // Code coverage plugin for scala
@@ -31,7 +29,6 @@ java {
 
 apply from: scriptsLocation + '/checkJavaVersion.gradle'
 apply from: scriptsLocation + '/spotless.gradle'
-apply from: scriptsLocation + '/pmd.gradle'
 apply from: scriptsLocation + '/scoverage.gradle'
 apply from: scriptsLocation + '/sonarqube.gradle'
 apply from: scriptsLocation + '/mavenCentralPublish.gradle'
@@ -63,18 +60,6 @@ dependencies {
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
   implementation "ch.qos.logback:logback-classic:1.5.18"
 
-  // used for ArrayHelper
-  implementation('com.github.ie3-institute:PowerSystemUtils:3.1.0') {
-    exclude group: 'org.apache.logging.log4j'
-    exclude group: 'org.slf4j'
-    /* Exclude our own nested dependencies */
-    exclude group: 'com.github.ie3-institute'
-  }
-
-  implementation 'com.googlecode.matrix-toolkits-java:mtj:1.0.4' // matrix data structures
-  implementation 'org.apache.commons:commons-math3:3.6.1'
-  implementation 'org.apache.commons:commons-lang3:3.18.0' // for HashCodeBuilder
-  implementation 'javax.measure:unit-api:2.2'
   implementation "org.scalanlp:breeze_${scalaVersion}:2.1.0" // Scientific calculations
 }
 
@@ -128,8 +113,6 @@ tasks.withType(ScalaCompile) {
 
 tasks {
   test {
-    // Solution for :compileScoverageGroovy
-    dependsOn compileScoverageGroovy  // or mustRunAfter compileScoverageGroovy
     dependsOn processScoverageResources
   }
 }
