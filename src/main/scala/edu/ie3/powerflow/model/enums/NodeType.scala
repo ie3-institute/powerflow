@@ -4,12 +4,9 @@
  * Research group Distribution grid planning and operation
  */
 
-package edu.ie3.powerflow.model.enums;
+package edu.ie3.powerflow.model.enums
 
 /** Enum to denote different node types in power flow calculation */
-public enum NodeType {
-  SL,
-  PV,
-  PQ,
-  PQ_INTERMEDIATE
+enum NodeType {
+  case SL, PV, PQ, PQ_INTERMEDIATE
 }
