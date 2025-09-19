@@ -19,6 +19,6 @@ object StartData {
   final case class WithLastState(
       nodes: Array[StateData],
       slVoltage: Complex,
-      jacobianMatrix: DenseMatrix[Double]
+      jacobianMatrix: DenseMatrix[Double],
   ) extends StartData
 }

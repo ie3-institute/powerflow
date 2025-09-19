@@ -60,7 +60,7 @@ object NodeData extends LazyLogging {
     */
   def correctOrder[T <: NodeData](
       unordered: Array[T],
-      intendedOrder: Option[Vector[Int]]
+      intendedOrder: Option[Vector[Int]],
   )(implicit ct: ClassTag[T]): Array[T] = {
     intendedOrder match {
       case None =>
@@ -113,7 +113,7 @@ object NodeData extends LazyLogging {
       activePowerMin: Option[Double] = None,
       activePowerMax: Option[Double] = None,
       reactivePowerMin: Option[Double] = None,
-      reactivePowerMax: Option[Double] = None
+      reactivePowerMax: Option[Double] = None,
   ) extends NodeData
 
   case object PresetData {
@@ -152,7 +152,7 @@ object NodeData extends LazyLogging {
       index: Int,
       nodeType: NodeType,
       voltage: Complex,
-      power: Complex
+      power: Complex,
   ) extends NodeData
 
   case object StateData {
@@ -162,7 +162,7 @@ object NodeData extends LazyLogging {
         presetData.index,
         presetData.nodeType,
         vGuess,
-        presetData.power
+        presetData.power,
       )
     }
 
@@ -213,7 +213,7 @@ object NodeData extends LazyLogging {
       index: Int,
       nodeType: NodeType,
       power: Complex,
-      squaredVoltageMagnitude: Double
+      squaredVoltageMagnitude: Double,
   )
 
 }

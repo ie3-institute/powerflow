@@ -33,7 +33,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex(-687.74492, 560.26817),
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex(-458.49661, 373.51212),
@@ -41,7 +41,7 @@ trait SixNodesTestData {
       Complex(-343.87246, 280.13409),
       Complex.zero,
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex.zero,
@@ -49,7 +49,7 @@ trait SixNodesTestData {
       Complex(343.87246, -280.12759),
       Complex.zero,
       Complex.zero,
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex(-687.74492, 560.26817),
@@ -57,7 +57,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex(2338.33273, -1904.89889),
       Complex(-1375.48984, 1120.53635),
-      Complex(-275.09797, 224.10727)
+      Complex(-275.09797, 224.10727),
     ),
     (
       Complex.zero,
@@ -65,7 +65,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex(-1375.48984, 1120.53635),
       Complex(1375.48984, -1120.53475),
-      Complex.zero
+      Complex.zero,
     ),
     (
       Complex.zero,
@@ -73,40 +73,40 @@ trait SixNodesTestData {
       Complex.zero,
       Complex(-275.09797, 224.10727),
       Complex.zero,
-      Complex(275.09797, -224.09917)
-    )
+      Complex(275.09797, -224.09917),
+    ),
   )
 
   protected val expectedJacobianMatrix: DenseMatrix[Double] = DenseMatrix(
     (
-      653.64621, -280.13409, 0.0, 0.0, 0.0, 802.36907, -343.87246, 0.0, 0.0, 0.0
+      653.64621, -280.13409, 0.0, 0.0, 0.0, 802.36907, -343.87246, 0.0, 0.0, 0.0,
     ),
     (
-      -280.13409, 280.13409, 0.0, 0.0, 0.0, -343.87246, 343.87246, 0.0, 0.0, 0.0
+      -280.13409, 280.13409, 0.0, 0.0, 0.0, -343.87246, 343.87246, 0.0, 0.0, 0.0,
     ),
     (
       0.0, 0.0, 1904.91179, -1120.53635, -224.10727, 0.0, 0.0,
-      2338.3327300000005, -1375.48984, -275.09797
+      2338.3327300000005, -1375.48984, -275.09797,
     ),
     (
       0.0, 0.0, -1120.53635, 1120.53635, 0.0, 0.0, 0.0, -1375.48984, 1375.48984,
-      0.0
+      0.0,
     ),
     (
-      0.0, 0.0, -224.10727, 0.0, 224.10727, 0.0, 0.0, -275.09797, 0.0, 275.09797
+      0.0, 0.0, -224.10727, 0.0, 224.10727, 0.0, 0.0, -275.09797, 0.0, 275.09797,
     ),
     (
-      -802.36907, 343.87246, 0.0, 0.0, 0.0, 653.62361, -280.13409, 0.0, 0.0, 0.0
+      -802.36907, 343.87246, 0.0, 0.0, 0.0, 653.62361, -280.13409, 0.0, 0.0, 0.0,
     ),
     (
-      343.87246, -343.87246, 0.0, 0.0, 0.0, -280.13409, 280.12109, 0.0, 0.0, 0.0
+      343.87246, -343.87246, 0.0, 0.0, 0.0, -280.13409, 280.12109, 0.0, 0.0, 0.0,
     ),
     (
       0.0, 0.0, 275.09797, 0.0, -275.09797, 0.0, 0.0, -224.10727, 0.0,
-      224.09106999999997
+      224.09106999999997,
     ),
     (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0),
-    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0)
+    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows
@@ -117,7 +117,7 @@ trait SixNodesTestData {
     PresetData(2, NodeType.PQ, Complex(5, 0)), /* Node 2 */
     PresetData(3, NodeType.PV, Complex(5, 0)), /* Node 3 */
     PresetData(4, NodeType.PV, Complex(5, 0)), /* Node 4 */
-    PresetData(5, NodeType.PQ, Complex(5, 0)) /* Node 5 */
+    PresetData(5, NodeType.PQ, Complex(5, 0)), /* Node 5 */
   )
 
   protected val initialState: Array[StateData] =
@@ -129,7 +129,7 @@ trait SixNodesTestData {
     StateData(2, NodeType.PQ, Complex(0.975, 0), Complex(5.0, 0.0)),
     StateData(3, NodeType.PV, Complex.one, Complex(5.0, 0.0)),
     StateData(4, NodeType.PV, Complex.one, Complex(5.0, 0.0)),
-    StateData(5, NodeType.PQ, Complex(0.95, 0), Complex(5.0, 0.0))
+    StateData(5, NodeType.PQ, Complex(0.95, 0), Complex(5.0, 0.0)),
   )
 
   protected val expectedLastStateWitIteratedPower = Array(
@@ -138,13 +138,13 @@ trait SixNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.985, 0),
-      Complex(3.387143682, 2.770284329)
+      Complex(3.387143682, 2.770284329),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.975, 0),
-      Complex(3.352756985, 2.73748644)
+      Complex(3.352756985, 2.73748644),
     ),
     StateData(3, NodeType.PV, Complex.one, Complex(-13.7548985, -11.1924635)),
     StateData(4, NodeType.PV, Complex.one, Complex(0, 1.6e-3)),
@@ -152,8 +152,8 @@ trait SixNodesTestData {
       5,
       NodeType.PQ,
       Complex(0.95, 0),
-      Complex(13.06715358, 10.65240558)
-    )
+      Complex(13.06715358, 10.65240558),
+    ),
   )
 
   protected val expectedDeviation: Array[DeviationData] = Array(
@@ -162,18 +162,18 @@ trait SixNodesTestData {
       1,
       NodeType.PQ,
       Complex(1.612856318, -2.770284329),
-      -0.029775
+      -0.029775,
     ),
     DeviationData(2, NodeType.PQ, Complex(1.647243015, -2.73748644), -0.049375),
     DeviationData(3, NodeType.PV, Complex(18.7548985, 11.1924635), 0.0),
     DeviationData(4, NodeType.PV, Complex(5.0, -1.6e-3), 0.0),
-    DeviationData(5, NodeType.PQ, Complex(-8.06715358, -10.65240558), -0.0975)
+    DeviationData(5, NodeType.PQ, Complex(-8.06715358, -10.65240558), -0.0975),
   )
 
   protected val expectedDeviationVector: DenseVector[Double] =
     DenseVector[Double](
       1.612856318, 1.647243015, 18.7548985, 5.0, -8.06715358, -2.770284329,
-      -2.73748644, -10.65240558, 0.0, 0.0
+      -2.73748644, -10.65240558, 0.0, 0.0,
     )
 
   protected val expectedNewState = Array(
@@ -182,32 +182,32 @@ trait SixNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.986608384359005, -0.010702565981),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.977627232935143, -0.017833425996),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       3,
       NodeType.PV,
       Complex(1.0, -0.02800042151243394),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       4,
       NodeType.PV,
       Complex(1.0, -0.032462570375342316),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       5,
       NodeType.PQ,
       Complex(0.9865890673875589, -0.036917689490892025),
-      Complex(5.0, 0.0)
-    )
+      Complex(5.0, 0.0),
+    ),
   )
 
   protected val expectedFinalState = Array(
@@ -216,31 +216,31 @@ trait SixNodesTestData {
       1,
       NodeType.PQ,
       Complex(0.98649405, -0.01068001),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       2,
       NodeType.PQ,
       Complex(0.97742277, -0.01779929),
-      Complex(5.0, 0.0)
+      Complex(5.0, 0.0),
     ),
     StateData(
       3,
       NodeType.PV,
       Complex(0.99962531, -0.02738150),
-      Complex(4.99999999, -12.92327040)
+      Complex(4.99999999, -12.92327040),
     ),
     StateData(
       4,
       NodeType.PV,
       Complex(0.99949285, -0.03185405),
-      Complex(5.00000000, -6.16415937)
+      Complex(5.00000000, -6.16415937),
     ),
     StateData(
       5,
       NodeType.PQ,
       Complex(0.98825801, -0.03597386),
-      Complex(5.0, 0.0)
-    )
+      Complex(5.0, 0.0),
+    ),
   )
 }

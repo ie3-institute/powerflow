@@ -31,7 +31,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
 
       val actual: Array[StateData] = NewtonRaphsonPF invokePrivate method(
         lastState,
-        admittanceMatrix
+        admittanceMatrix,
       )
 
       val eval = (actual zip expectedLastStateWitIteratedPower).forall(
@@ -56,7 +56,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
       val actual: Array[DeviationData] = NewtonRaphsonPF invokePrivate method(
         operationPoint,
         StateData.extractVoltageVector(lastState),
-        iteratedPower
+        iteratedPower,
       )
 
       val eval =
@@ -99,7 +99,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
       val actualOpt = NewtonRaphsonPF invokePrivate method(
         lastState,
         expectedDeviationVector,
-        expectedJacobianMatrix
+        expectedJacobianMatrix,
       )
 
       actualOpt.isDefined should be(true)
@@ -137,7 +137,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
             ) < finalResultTolerance && abs(
               actual.power.imag - expected.power.imag
             ) < finalResultTolerance
-            if (!result) {
+            if !result then {
               logger.error(
                 s"Mismatch in final result of node {${actual.index}}: actual(v = ${actual.voltage}, " +
                   s"s = ${actual.power}) vs. expected(v = ${expected.voltage}, s = ${expected.power})"

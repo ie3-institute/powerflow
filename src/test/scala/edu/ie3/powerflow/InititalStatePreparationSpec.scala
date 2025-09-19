@@ -11,7 +11,7 @@ import breeze.numerics.abs
 import edu.ie3.powerflow.model.NodeData.StateData
 import edu.ie3.powerflow.model.StartData.{
   WithForcedStartVoltages,
-  WithLastState
+  WithLastState,
 }
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.test.common.UnitSpec
@@ -28,7 +28,7 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(2, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 2 */
         StateData(3, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 3 */
         StateData(4, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 4 */
-        StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)) /* Node 5 */
+        StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 5 */
       )
       val actual = NewtonRaphsonPF.getInitialState(operationPoint, None)
 
@@ -44,7 +44,7 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
             StateData(2, NodeType.PQ, Complex(0.99, 0.0), Complex.zero),
             StateData(3, NodeType.PV, Complex(0.985, 0.0), Complex.zero),
             StateData(4, NodeType.PV, Complex(0.98, 0.0), Complex.zero),
-            StateData(5, NodeType.PQ, Complex(0.975, 0.0), Complex.zero)
+            StateData(5, NodeType.PQ, Complex(0.975, 0.0), Complex.zero),
           )
         )
       )
@@ -55,7 +55,7 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(2, NodeType.PQ, Complex(0.99, 0.0), Complex.zero),
         StateData(3, NodeType.PV, Complex(0.985, 0.0), Complex.zero),
         StateData(4, NodeType.PV, Complex(0.98, 0.0), Complex.zero),
-        StateData(5, NodeType.PQ, Complex(0.975, 0.0), Complex.zero)
+        StateData(5, NodeType.PQ, Complex(0.975, 0.0), Complex.zero),
       )
       val actual =
         NewtonRaphsonPF.getInitialState(operationPoint, withForcedState)
@@ -78,7 +78,7 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(2, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 2 */
         StateData(3, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 3 */
         StateData(4, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 4 */
-        StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)) /* Node 5 */
+        StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 5 */
       )
       val actual =
         NewtonRaphsonPF.getInitialState(operationPoint, withForcedSlackVoltage)
@@ -92,33 +92,33 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
           0,
           NodeType.SL,
           Complex(0.9985, 0.0125),
-          Complex(-6.87744915, -5.5946818)
+          Complex(-6.87744915, -5.5946818),
         ),
         StateData(
           1,
           NodeType.PQ,
           Complex(0.985, 0),
-          Complex(3.387143682, 2.770284329)
+          Complex(3.387143682, 2.770284329),
         ),
         StateData(
           2,
           NodeType.PQ,
           Complex(0.975, 0),
-          Complex(3.352756985, 2.73748644)
+          Complex(3.352756985, 2.73748644),
         ),
         StateData(
           3,
           NodeType.PV,
           Complex.one,
-          Complex(-13.7548985, -11.1924635)
+          Complex(-13.7548985, -11.1924635),
         ),
         StateData(4, NodeType.PV, Complex.one, Complex(0, 1.6e-3)),
         StateData(
           5,
           NodeType.PQ,
           Complex(0.95, 0),
-          Complex(13.06715358, 10.65240558)
-        )
+          Complex(13.06715358, 10.65240558),
+        ),
       )
       val withLastState =
         Option.apply(
@@ -133,38 +133,38 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
           0,
           NodeType.SL,
           Complex.one,
-          Complex(-6.87744915, -5.5946818)
+          Complex(-6.87744915, -5.5946818),
         ),
         StateData(
           1,
           NodeType.PQ,
           Complex(0.986608384359005, -0.010702565981),
-          Complex(3.387143682, 2.770284329)
+          Complex(3.387143682, 2.770284329),
         ),
         StateData(
           2,
           NodeType.PQ,
           Complex(0.977627232935143, -0.017833425996),
-          Complex(3.352756985, 2.73748644)
+          Complex(3.352756985, 2.73748644),
         ),
         StateData(
           3,
           NodeType.PV,
           Complex(1.0, -0.02800042151243394),
-          Complex(-13.7548985, -11.1924635)
+          Complex(-13.7548985, -11.1924635),
         ),
         StateData(
           4,
           NodeType.PV,
           Complex(1.0, -0.032462570375342316),
-          Complex(0, 1.6e-3)
+          Complex(0, 1.6e-3),
         ),
         StateData(
           5,
           NodeType.PQ,
           Complex(0.9865890673875589, -0.036917689490892025),
-          Complex(13.06715358, 10.65240558)
-        )
+          Complex(13.06715358, 10.65240558),
+        ),
       )
 
       val toleranceMet =

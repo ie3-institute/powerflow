@@ -22,7 +22,7 @@ object PowerFlowResult {
     final case class ValidNewtonRaphsonPFResult(
         iteration: Int,
         nodeData: Array[StateData],
-        jacobianMatrix: DenseMatrix[Double]
+        jacobianMatrix: DenseMatrix[Double],
     ) extends SuccessFullPowerFlowResult
   }
 
@@ -33,7 +33,7 @@ object PowerFlowResult {
   object FailedPowerFlowResult {
     final case class FailedNewtonRaphsonPFResult(
         iteration: Int,
-        cause: FailureCause
+        cause: FailureCause,
     ) extends FailedPowerFlowResult
   }
 }
