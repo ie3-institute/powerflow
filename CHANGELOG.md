@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Update
 - Updating gradle to 9.1.0 [#248](https://github.com/ie3-institute/powerflow/issues/248)
+- Updating Java to 21 [#251](https://github.com/ie3-institute/powerflow/issues/251)
 
 ## [0.3]
 
