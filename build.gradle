@@ -13,7 +13,7 @@ plugins {
 ext {
   javaVersion = JavaVersion.VERSION_21
   scalaVersion = '3'
-  scalaBinaryVersion = '3.7.3'
+  scalaBinaryVersion = '3.7.4'
 
   scapegoatVersion = '3.2.2'
 
