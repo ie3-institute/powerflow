@@ -73,7 +73,7 @@ compileScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
-    "-P:scapegoat:disabledInspections:VariableShadowing",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
     "-P:scapegoat:ignoredFiles:.*/PowerFactoryGrid.scala" // see scapegoat-sbt page for this param
   ]
 }
@@ -83,7 +83,7 @@ compileTestScala {
   scalaCompileOptions.additionalParameters = [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
-    "-P:scapegoat:disabledInspections:VariableShadowing"
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes"
   ]
 }
 
