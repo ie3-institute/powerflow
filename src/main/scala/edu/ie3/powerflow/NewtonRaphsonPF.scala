@@ -21,17 +21,17 @@ import edu.ie3.powerflow.model.StartData.{
   WithForcedStartVoltages,
   WithLastState,
 }
+import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.model.{
   JacobianMatrix,
   NodeData,
   PowerFlowResult,
   StartData,
 }
-import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 /** Representation of the Newton-Raphson algorithm to solve the system of
   * non-linear equations, that do describe a power grid.
@@ -471,18 +471,34 @@ case object NewtonRaphsonPF extends LazyLogging {
   ): Option[Array[StateData]] = {
     val nodeCount = lastState.length
 
-    val correction: Option[DenseVector[Double]] =
-      scala.util.control.Exception.allCatch.withTry {
-        jacobianMatrix \ deviation
-      } match {
-        case Success(correction) => Some(correction)
-        case Failure(exception) =>
-          logger.error("Error while solving jacobian matrix: {}", exception)
-          None
-      }
+    val correction: Try[DenseVector[Double]] = Try {
+      jacobianMatrix \ deviation
+    }.recoverWith {
+      case e: IllegalArgumentException =>
+        Failure(
+          new Exception(
+            s"Invalid dimensions for Jacobian/deviation. Details: ${e.getMessage}",
+            e,
+          )
+        )
+      case e if e.getMessage.toLowerCase.contains("singular") =>
+        Failure(
+          new Exception(
+            s"Failed to solve Jacobian system: matrix may be singular. Details: ${e.getMessage}",
+            e,
+          )
+        )
+      case e =>
+        Failure(
+          new Exception(
+            s"Unexpected error while solving Jacobian system: ${e.getMessage}",
+            e,
+          )
+        )
+    }
 
     correction match {
-      case Some(correction) =>
+      case Success(correction) =>
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
@@ -527,7 +543,11 @@ case object NewtonRaphsonPF extends LazyLogging {
               }
             )
         Some(nextState)
-      case None =>
+      case Failure(exception) =>
+        logger.error(
+          s"Error while calculating correction: ${exception.getMessage}",
+          exception,
+        )
         None
     }
   }
