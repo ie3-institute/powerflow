@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
+### Added
+- Added basic readTheDocs structure for documentation [#12](https://github.com/ie3-institute/powerflow/issues/12)
+
 ### Changed
 - Provide error message when fail calculating the correction [#24](https://github.com/ie3-institute/powerflow/issues/24)
 
