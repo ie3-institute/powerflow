@@ -32,7 +32,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
     }
 
     "throw an PowerFlowException, if the intended and actual node length does not match" in {
-      val intendedOrder = Option.apply((0 to 6).toVector)
+      val intendedOrder = (0 to 6).toVector
 
       val thrown = intercept[PowerFlowException] {
         NodeData.correctOrder(operationPoint, intendedOrder)
@@ -44,7 +44,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
     }
 
     "correct the order of an input array according to the specified order" in {
-      val intendedOrder = Option.apply(Vector(0, 1, 3, 5, 2, 4))
+      val intendedOrder = Vector(0, 1, 3, 5, 2, 4)
 
       val expected: Array[PresetData] = Array(
         PresetData(0, NodeType.SL, Complex(0, 0)), /* Node 0 */

@@ -8,6 +8,7 @@ package edu.ie3.test.common.powerflow
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.math.Complex
+import edu.ie3.powerflow.model.{IndexCorrection, NodeData}
 import edu.ie3.powerflow.model.NodeData.{DeviationData, PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
 
@@ -102,8 +103,7 @@ trait SixNodesTestData {
       343.87246, -343.87246, 0.0, 0.0, 0.0, -280.13409, 280.12109, 0.0, 0.0, 0.0,
     ),
     (
-      0.0, 0.0, 275.09797, 0.0, -275.09797, 0.0, 0.0, -224.10727, 0.0,
-      224.09106999999997,
+      0.0, 0.0, 275.09797, 0.0, -275.09797, 0.0, 0.0, -224.11537, 0.0, 224.09917,
     ),
     (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0),
     (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0),
@@ -119,6 +119,8 @@ trait SixNodesTestData {
     PresetData(4, NodeType.PV, Complex(5, 0)), /* Node 4 */
     PresetData(5, NodeType.PQ, Complex(5, 0)), /* Node 5 */
   )
+
+  protected val indexCorrection = IndexCorrection(operationPoint)
 
   protected val initialState: Array[StateData] =
     operationPoint.map(op => StateData(op))

@@ -19,6 +19,7 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
       val method =
         PrivateMethod[DenseMatrix[Double]](Symbol("buildJacobianMatrix"))
       val actual = JacobianMatrix invokePrivate method(
+        indexCorrections,
         initialState,
         admittanceMatrix,
       )
@@ -28,7 +29,7 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
 
       /* Prompt whats wrong to understand where the bomb explodes */
       for
-        rowIdx <- 0 until expectedJacobianMatrix.rows;
+        rowIdx <- 0 until expectedJacobianMatrix.rows
         colIdx <- 0 until expectedJacobianMatrix.rows
       do {
         if abs(
@@ -36,7 +37,7 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
               .valueAt(rowIdx, colIdx)
           ) > testTolerance
         then
-          logger.debug(s"Mismatch in (${rowIdx}, ${colIdx}): Actual = ${actual
+          logger.debug(s"Mismatch in ($rowIdx, $colIdx): Actual = ${actual
               .valueAt(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix
               .valueAt(rowIdx, colIdx)}")
       }

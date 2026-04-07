@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Provide error message when fail calculating the correction [#24](https://github.com/ie3-institute/powerflow/issues/24)
+- Improved calculation of jacobian matrix [#298](https://github.com/ie3-institute/powerflow/issues/298)
 
 ## [0.4]
 

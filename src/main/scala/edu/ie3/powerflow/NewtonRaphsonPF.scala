@@ -10,6 +10,7 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.math.Complex
 import breeze.numerics.{abs, pow}
 import com.typesafe.scalalogging.LazyLogging
+import edu.ie3.powerflow.model.*
 import edu.ie3.powerflow.model.FailureCause.{
   CalculationFailed,
   MaxIterationsReached,
@@ -22,12 +23,7 @@ import edu.ie3.powerflow.model.StartData.{
   WithLastState,
 }
 import edu.ie3.powerflow.model.enums.NodeType
-import edu.ie3.powerflow.model.{
-  JacobianMatrix,
-  NodeData,
-  PowerFlowResult,
-  StartData,
-}
+import edu.ie3.powerflow.model.enums.NodeType.SL
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
 
 import scala.annotation.tailrec
@@ -49,30 +45,15 @@ import scala.util.{Failure, Success, Try}
   *   Maximum amount of iterations
   * @param admittanceMatrix
   *   The dimensionless admittance matrix describing the grid structure
-  * @param intendedIndexOrder
-  *   A Vector of node indices denoting the intended order of nodes being use
-  *   for sanity checks
   */
 @SerialVersionUID(1L)
 final case class NewtonRaphsonPF(
     epsilon: Double,
     maxIterations: Integer,
     admittanceMatrix: DenseMatrix[Complex],
-    intendedIndexOrder: Option[Vector[Int]] = None,
 ) extends LazyLogging {
   if admittanceMatrix.rows != admittanceMatrix.cols then
     throw new PowerFlowException("Have a square matrix ready!")
-  intendedIndexOrder match {
-    case Some(intendedOrder) if intendedOrder.length != admittanceMatrix.cols =>
-      throw new PowerFlowException(
-        "The intended amount of nodes does not fit the dimensions of the admittance matrix!"
-      )
-    case None =>
-      logger.debug(
-        "You did not provide an intended node ordering, therefore no sanity checks will be performed"
-      )
-    case _ =>
-  }
 
   /** Do calculate the final power flow result of the given operation point
     * under consideration of the given external initialisation data. The single
@@ -83,33 +64,36 @@ final case class NewtonRaphsonPF(
     * ATTENTION: The ordering in initData has to meet the order of the
     * admittance matrix provided with the constructor!
     *
-    * @param operationPointUnordered
-    *   The given operation point, with which the grid is used
     * @param initData
-    *   Externally provided initialisation data, see [[calculate()]] for details
+    *   Externally provided initialization data, see [[calculate()]] for details
     *   on which data can be provided
     * @return
     *   The result of the calculation based as [[PowerFlowResult]]
     */
   def calculate(
-      operationPointUnordered: Array[PresetData],
+      operationPoint: Array[PresetData],
       initData: Option[StartData] = None,
   ): PowerFlowResult = {
-    val operationPoint =
-      NodeData.correctOrder(operationPointUnordered, intendedIndexOrder)
-    val startDataUnordered: Array[StateData] =
+    val indexCorrection = IndexCorrection(operationPoint)
+
+    val startData: Array[StateData] =
       NewtonRaphsonPF.getInitialState(operationPoint, initData)
-    val startData =
-      NodeData.correctOrder(startDataUnordered, intendedIndexOrder)
 
     /* Solve the inner iterations recursively */
-    solveIterationStepsRecursively(0, operationPoint, startData)
+    solveIterationStepsRecursively(
+      0,
+      indexCorrection,
+      operationPoint,
+      startData,
+    )
   }
 
   /** Solving the iteration steps recursively
     *
     * @param iterationCount
     *   Current number of iterations
+   * @param indexCorrection
+   *   Information for correction of the index.
     * @param operationPoint
     *   Given operation point, with which the grid is used
     * @param lastState
@@ -120,6 +104,7 @@ final case class NewtonRaphsonPF(
   @tailrec
   private def solveIterationStepsRecursively(
       iterationCount: Integer = 0,
+      indexCorrection: IndexCorrection,
       operationPoint: Array[PresetData],
       lastState: Array[StateData],
   ): PowerFlowResult = {
@@ -143,6 +128,7 @@ final case class NewtonRaphsonPF(
     val converged = deviationVector.forall(abs(_) < epsilon)
     val jacobianMatrix =
       JacobianMatrix.buildJacobianMatrix(
+        indexCorrection,
         lastStateWithIterationPower,
         admittanceMatrix,
       )
@@ -165,6 +151,7 @@ final case class NewtonRaphsonPF(
           if !converged && iterationCount < maxIterations =>
         solveIterationStepsRecursively(
           iterationCount + 1,
+          indexCorrection,
           operationPoint,
           correctedState,
         )

@@ -21,6 +21,7 @@ class SixNodesJacobianMatrixSpec extends UnitSpec with SixNodesTestData {
         PrivateMethod[DenseMatrix[Double]](Symbol("buildJacobianMatrix"))
 
       val actual = JacobianMatrix invokePrivate method(
+        indexCorrection,
         initialState,
         admittanceMatrix,
       )
@@ -28,9 +29,9 @@ class SixNodesJacobianMatrixSpec extends UnitSpec with SixNodesTestData {
       actual.rows should be(expectedJacobianMatrix.rows)
       actual.cols should be(expectedJacobianMatrix.cols)
 
-      /* Prompt whats wrong to understand where the bomb explodes */
+      /* Prompt what's wrong to understand where the bomb explodes */
       for
-        rowIdx <- 0 until expectedJacobianMatrix.rows;
+        rowIdx <- 0 until expectedJacobianMatrix.rows
         colIdx <- 0 until expectedJacobianMatrix.rows
       do {
         if abs(
@@ -38,7 +39,7 @@ class SixNodesJacobianMatrixSpec extends UnitSpec with SixNodesTestData {
               .valueAt(rowIdx, colIdx)
           ) > testTolerance
         then
-          logger.debug(s"Mismatch in (${rowIdx}, ${colIdx}): Actual = ${actual
+          logger.debug(s"Mismatch in ($rowIdx, $colIdx): Actual = ${actual
               .valueAt(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix
               .valueAt(rowIdx, colIdx)}")
       }
