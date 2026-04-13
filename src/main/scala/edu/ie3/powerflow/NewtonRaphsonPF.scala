@@ -6,9 +6,7 @@
 
 package edu.ie3.powerflow
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.math.Complex
-import breeze.numerics.{abs, pow}
+import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector}
 import com.typesafe.scalalogging.LazyLogging
 import edu.ie3.powerflow.model.*
 import edu.ie3.powerflow.model.FailureCause.{
@@ -27,6 +25,7 @@ import edu.ie3.powerflow.model.enums.NodeType.SL
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
 
 import scala.annotation.tailrec
+import scala.math.pow
 import scala.util.{Failure, Success, Try}
 
 /** Representation of the Newton-Raphson algorithm to solve the system of
@@ -92,8 +91,8 @@ final case class NewtonRaphsonPF(
     *
     * @param iterationCount
     *   Current number of iterations
-   * @param indexCorrection
-   *   Information for correction of the index.
+    * @param indexCorrection
+    *   Information for correction of the index.
     * @param operationPoint
     *   Given operation point, with which the grid is used
     * @param lastState
@@ -125,7 +124,7 @@ final case class NewtonRaphsonPF(
       )
     val deviationVector =
       NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation)
-    val converged = deviationVector.forall(abs(_) < epsilon)
+    val converged = deviationVector.forall(_.abs < epsilon)
     val jacobianMatrix =
       JacobianMatrix.buildJacobianMatrix(
         indexCorrection,
@@ -290,10 +289,13 @@ case object NewtonRaphsonPF extends LazyLogging {
       admittanceMatrix: DenseMatrix[Complex],
   ): Array[StateData] = {
     val v = StateData.extractVoltageVector(state)
-    val nodalPower = v *:* (admittanceMatrix * v).map(i => i.conjugate)
-    (state zip nodalPower.toScalaVector).map(stateAndPowerPair =>
-      stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
-    )
+
+    val nodalPower = v *:* (admittanceMatrix * v).map(_.conjugate)
+    state
+      .zip(nodalPower.toArray)
+      .map(stateAndPowerPair =>
+        stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
+      )
   }
 
   /** Does check for reactive power limit violations. If there is any violation
@@ -318,8 +320,9 @@ case object NewtonRaphsonPF extends LazyLogging {
     then None
     else {
       val intermediateOperationPoint =
-        (operationPoint zip iterationPower.toScalaVector).map(
-          nodeDataWithPower => {
+        operationPoint
+          .zip(iterationPower.toArray)
+          .map(nodeDataWithPower => {
             val nodeData = nodeDataWithPower._1
             val power = nodeDataWithPower._2
             nodeData.nodeType match {
@@ -353,8 +356,7 @@ case object NewtonRaphsonPF extends LazyLogging {
                 } else nodeData
               case _ => nodeData
             }
-          }
-        )
+          })
 
       Some(intermediateOperationPoint)
     }
@@ -489,7 +491,8 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
-          (deltaE.toScalaVector zip deltaF.toScalaVector)
+          deltaE.toArray
+            .zip(deltaF.toArray)
             .map(complexPair => Complex(complexPair._1, complexPair._2))
 
         val indicesOfPVPQnodes =
@@ -504,9 +507,9 @@ case object NewtonRaphsonPF extends LazyLogging {
               s" but only ${indexToCorrection.length} matches."
           )
 
-        val correctionFilledUp = DenseVector.zeros[Complex](nodeCount)
+        val correctionFilledUp = DenseVector.filled(nodeCount, Complex.zero)
         for correctionPair <- indexToCorrection do {
-          correctionFilledUp.update(correctionPair._1, correctionPair._2)
+          correctionFilledUp(correctionPair._1) = correctionPair._2
         }
         val newVoltages =
           StateData.extractVoltageVector(lastState) - correctionFilledUp

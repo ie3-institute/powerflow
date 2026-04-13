@@ -6,12 +6,13 @@
 
 package edu.ie3.powerflow
 
-import breeze.numerics.abs
 import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.SixNodesTestData
+
+import scala.math.abs
 
 class SixNodesNewtonRaphsonQLimitSpec extends UnitSpec with SixNodesTestData {
   val tolerance = 1e-12

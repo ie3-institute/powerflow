@@ -6,14 +6,15 @@
 
 package edu.ie3.powerflow
 
-import breeze.linalg.DenseVector
-import breeze.numerics.abs
+import edu.ie3.powerflow.math.{DenseVector, Complex}
 import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.ThreeNodesTestData
+
+import scala.math.abs
 
 class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
   val tolerance = 1e-12
@@ -85,7 +86,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
       actual.length should be(2 * nodeCount - 2)
 
       val eval =
-        expectedDeviationVector.toScalaVector.zipWithIndex
+        expectedDeviationVector.toArray.zipWithIndex
           .forall(currentEntry =>
             (currentEntry._1 - actual(currentEntry._2)).abs < 1e-4
           )

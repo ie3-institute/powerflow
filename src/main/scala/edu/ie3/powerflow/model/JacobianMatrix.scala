@@ -6,12 +6,10 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.math.Complex
-import breeze.storage.Zero
+import edu.ie3.powerflow.math.DenseMatrix.*
+import edu.ie3.powerflow.math.DenseVector.*
+import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector}
 import edu.ie3.powerflow.model.NodeData.StateData
-
-import scala.reflect.ClassTag
 
 object JacobianMatrix {
 
@@ -42,7 +40,7 @@ object JacobianMatrix {
     val indexesWithoutSlackAndPQ = indexCorrection.indexesWithoutSlackAndPQ
 
     val dim = 2 * countNoSlack
-    val fullMatrix: DenseMatrix[Double] = DenseMatrix.zeros(dim, dim)
+    val fullMatrix: DenseMatrix[Double] = DenseMatrix.filled(dim, dim, 0d)
 
     val (gif, bie, gie, bif) = getSums(admittanceMatrix, voltages)
 
@@ -172,25 +170,13 @@ object JacobianMatrix {
       DenseVector[Double],
       DenseVector[Double],
   ) = {
-    val size = voltages.size
+    val (g, b) = matrix.split
+    val (e, f) = voltages.split
 
-    val gif: DenseVector[Double] = DenseVector.zeros(size)
-    val bie: DenseVector[Double] = DenseVector.zeros(size)
-    val gie: DenseVector[Double] = DenseVector.zeros(size)
-    val bif: DenseVector[Double] = DenseVector.zeros(size)
-
-    matrix.activeIterator.foreach { case ((i, _), value) =>
-      val vi = voltages(i)
-      val fi = vi.imag
-      val ei = vi.real
-      val bij = value.imag
-      val gij = value.real
-
-      gif(i) += gij * fi
-      bie(i) += bij * ei
-      gie(i) += gij * ei
-      bif(i) += bij * fi
-    }
+    val gif = g * f
+    val bie = b * e
+    val gie = g * e
+    val bif = b * f
 
     (gif, bie, gie, bif)
   }

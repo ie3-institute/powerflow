@@ -6,8 +6,7 @@
 
 package edu.ie3.test.common.powerflow
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseMatrix, DenseVector, Complex}
 import edu.ie3.powerflow.model.{IndexCorrection, NodeData}
 import edu.ie3.powerflow.model.NodeData.{DeviationData, PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
@@ -28,7 +27,7 @@ import edu.ie3.powerflow.model.enums.NodeType
   */
 trait SixNodesTestData {
   protected val admittanceMatrix: DenseMatrix[Complex] = DenseMatrix(
-    (
+    Seq(
       Complex(1146.24153, -933.77229),
       Complex(-458.49661, 373.51212),
       Complex.zero,
@@ -36,7 +35,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex(-458.49661, 373.51212),
       Complex(802.36907, -653.63491),
       Complex(-343.87246, 280.13409),
@@ -44,7 +43,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex.zero,
       Complex(-343.87246, 280.13409),
       Complex(343.87246, -280.12759),
@@ -52,7 +51,7 @@ trait SixNodesTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex(-687.74492, 560.26817),
       Complex.zero,
       Complex.zero,
@@ -60,7 +59,7 @@ trait SixNodesTestData {
       Complex(-1375.48984, 1120.53635),
       Complex(-275.09797, 224.10727),
     ),
-    (
+    Seq(
       Complex.zero,
       Complex.zero,
       Complex.zero,
@@ -68,7 +67,7 @@ trait SixNodesTestData {
       Complex(1375.48984, -1120.53475),
       Complex.zero,
     ),
-    (
+    Seq(
       Complex.zero,
       Complex.zero,
       Complex.zero,
@@ -79,34 +78,34 @@ trait SixNodesTestData {
   )
 
   protected val expectedJacobianMatrix: DenseMatrix[Double] = DenseMatrix(
-    (
-      653.64621, -280.13409, 0.0, 0.0, 0.0, 802.36907, -343.87246, 0.0, 0.0, 0.0,
+    Seq(
+      653.63491, -280.13409, 0.0, 0.0, 0.0, 802.36907, -343.87246, 0.0, 0.0, 0.0,
     ),
-    (
-      -280.13409, 280.13409, 0.0, 0.0, 0.0, -343.87246, 343.87246, 0.0, 0.0, 0.0,
+    Seq(
+      -280.13409, 280.12759, 0.0, 0.0, 0.0, -343.87246, 343.87246, 0.0, 0.0, 0.0,
     ),
-    (
-      0.0, 0.0, 1904.91179, -1120.53635, -224.10727, 0.0, 0.0,
+    Seq(
+      0.0, 0.0, 1904.89889, -1120.53635, -224.10727, 0.0, 0.0,
       2338.3327300000005, -1375.48984, -275.09797,
     ),
-    (
-      0.0, 0.0, -1120.53635, 1120.53635, 0.0, 0.0, 0.0, -1375.48984, 1375.48984,
+    Seq(
+      0.0, 0.0, -1120.53635, 1120.53475, 0.0, 0.0, 0.0, -1375.48984, 1375.48984,
       0.0,
     ),
-    (
-      0.0, 0.0, -224.10727, 0.0, 224.10727, 0.0, 0.0, -275.09797, 0.0, 275.09797,
+    Seq(
+      0.0, 0.0, -224.10727, 0.0, 224.09917, 0.0, 0.0, -275.09797, 0.0, 275.09797,
     ),
-    (
-      -802.36907, 343.87246, 0.0, 0.0, 0.0, 653.62361, -280.13409, 0.0, 0.0, 0.0,
+    Seq(
+      -802.36907, 343.87246, 0.0, 0.0, 0.0, 653.634911, -280.13409, 0.0, 0.0, 0.0,
     ),
-    (
-      343.87246, -343.87246, 0.0, 0.0, 0.0, -280.13409, 280.12109, 0.0, 0.0, 0.0,
+    Seq(
+      343.87246, -343.87246, 0.0, 0.0, 0.0, -280.13409, 280.12759, 0.0, 0.0, 0.0,
     ),
-    (
-      0.0, 0.0, 275.09797, 0.0, -275.09797, 0.0, 0.0, -224.11537, 0.0, 224.09917,
+    Seq(
+      0.0, 0.0, 275.09797, 0.0, -275.09797, 0.0, 0.0, -224.10727, 0.0, 224.09917,
     ),
-    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0),
-    (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0),
+    Seq(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0),
+    Seq(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows

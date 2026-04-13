@@ -6,8 +6,7 @@
 
 package edu.ie3.powerflow
 
-import breeze.math.Complex
-import breeze.numerics.abs
+import edu.ie3.powerflow.math.Complex
 import edu.ie3.powerflow.model.NodeData.StateData
 import edu.ie3.powerflow.model.StartData.{
   WithForcedStartVoltages,
@@ -16,6 +15,8 @@ import edu.ie3.powerflow.model.StartData.{
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.SixNodesTestData
+
+import scala.math.abs
 
 class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
   val testTolerance = 1e-3

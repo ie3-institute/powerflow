@@ -6,8 +6,7 @@
 
 package edu.ie3.test.common.powerflow
 
-import breeze.linalg.{DenseMatrix, DenseVector}
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseMatrix, DenseVector, Complex}
 import edu.ie3.powerflow.model.IndexCorrection
 import edu.ie3.powerflow.model.NodeData.{DeviationData, PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
@@ -25,17 +24,17 @@ import edu.ie3.powerflow.model.enums.NodeType
   */
 trait ThreeNodesTestData {
   protected val admittanceMatrix: DenseMatrix[Complex] = DenseMatrix(
-    (
+    Seq(
       Complex(1650.58781, -1344.63392),
       Complex(-1375.48984, 1120.53635),
       Complex(-275.09797, 224.10727),
     ),
-    (
+    Seq(
       Complex(-1375.48984, 1120.53635),
       Complex(1375.48984, -1120.53475),
       Complex.zero,
     ),
-    (
+    Seq(
       Complex(-275.09797, 224.10727),
       Complex.zero,
       Complex(275.09797, -224.09917),
@@ -43,10 +42,10 @@ trait ThreeNodesTestData {
   )
 
   protected val expectedJacobianMatrix: DenseMatrix[Double] = DenseMatrix(
-    (1120.53635, 0.0, 1375.48984, 0.0),
-    (0.0, 224.10727, 0.0, 275.09797),
-    (-1375.48984, 0.0, 1120.53315, 0.0),
-    (0.0, -275.09797, 0.0, 224.09106999999997),
+    Seq(1120.53475, 0.0, 1375.48984, 0.0),
+    Seq(0.0, 224.09917, 0.0, 275.09797),
+    Seq(-1375.48984, 0.0, 1120.53475, 0.0),
+    Seq(0.0, -275.09797, 0.0, 224.09917),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows

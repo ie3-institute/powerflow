@@ -6,8 +6,7 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.DenseMatrix
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseMatrix, Complex}
 import edu.ie3.powerflow.model.NodeData.StateData
 
 sealed trait StartData

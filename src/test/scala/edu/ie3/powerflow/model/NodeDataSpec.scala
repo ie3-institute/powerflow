@@ -6,8 +6,7 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.DenseVector
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseVector, Complex}
 import edu.ie3.powerflow.model.NodeData.{PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.util.exceptions.PowerFlowException

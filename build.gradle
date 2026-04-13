@@ -8,6 +8,7 @@ plugins {
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id 'maven-publish'
   id 'signing'
+  id "idea"
 }
 
 ext {
@@ -39,11 +40,28 @@ configurations {
   scalaCompilerPlugin
 }
 
+idea {
+  module {
+    //if you love browsing Javadoc
+    downloadJavadoc = true
+
+    //if you love reading sources :)
+    downloadSources = true
+  }
+}
+
 repositories {
   mavenCentral()
 }
 
 dependencies {
+
+  // Blas and Lapack //
+  implementation "dev.ludovic.netlib:blas:3.0.1"
+  implementation "dev.ludovic.netlib:lapack:3.0.1"
+  implementation "dev.ludovic.netlib:arpack:3.0.1"
+  implementation "net.sourceforge.f2j:arpack_combined_all:0.1"
+
 
   // CORE Scala //
   implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
