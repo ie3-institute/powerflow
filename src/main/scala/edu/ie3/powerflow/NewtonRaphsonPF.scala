@@ -92,8 +92,8 @@ final case class NewtonRaphsonPF(
     *
     * @param iterationCount
     *   Current number of iterations
-   * @param indexCorrection
-   *   Information for correction of the index.
+    * @param indexCorrection
+    *   Information for correction of the index.
     * @param operationPoint
     *   Given operation point, with which the grid is used
     * @param lastState
