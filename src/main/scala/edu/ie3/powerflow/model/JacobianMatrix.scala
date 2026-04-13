@@ -108,7 +108,7 @@ object JacobianMatrix {
       }
     }
 
-    val pqOffset = indexMapping.countPQ - 1
+    val pqOffset = indexMapping.nodeCountPQ - 1
     for
       row <- 0 until countNoSlackAndPQ
       col <- 0 until countNoSlack

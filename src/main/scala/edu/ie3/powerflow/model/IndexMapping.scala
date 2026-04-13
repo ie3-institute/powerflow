@@ -27,7 +27,6 @@ final case class IndexMapping(
   val nodeCountWithoutSlack: Int = indexesWithoutSlack.size
   val nodeCountPQ: Int = indexesWithoutSlackAndPV.size
   val nodeCountPV: Int = indexesWithoutSlackAndPQ.size
-  val countPQ: Int = nodeCountPQ
 }
 
 object IndexMapping {
