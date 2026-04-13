@@ -6,176 +6,194 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.{Axis, DenseMatrix}
+import breeze.linalg.{DenseMatrix, DenseVector}
 import breeze.math.Complex
+import breeze.storage.Zero
 import edu.ie3.powerflow.model.NodeData.StateData
-import edu.ie3.powerflow.model.enums.NodeType
-import edu.ie3.powerflow.util.exceptions.PowerFlowException
 
-/** Data model for the sub matrices of partial derivations
-  * @param dPdF
-  *   Sub matrix of partial deviation of active power to imaginary part of
-  *   voltage
-  * @param dPdE
-  *   Sub matrix of partial deviation of active power to real part of voltage
-  * @param dQdF
-  *   Sub matrix of partial deviation of reactive power to imaginary part of
-  *   voltage
-  * @param dQdE
-  *   Sub matrix of partial deviation of reactive power to real part of voltage
-  * @param dV2dF
-  *   Sub matrix of partial deviation of squared voltage magnitude to imaginary
-  *   part of voltage
-  * @param dV2dE
-  *   Sub matrix of partial deviation of squared voltage magnitude to real part
-  *   of voltage
-  */
-final case class JacobianMatrix(
-    dPdF: DenseMatrix[Double],
-    dPdE: DenseMatrix[Double],
-    dQdF: DenseMatrix[Double],
-    dQdE: DenseMatrix[Double],
-    dV2dF: DenseMatrix[Double],
-    dV2dE: DenseMatrix[Double],
-)
+import scala.reflect.ClassTag
 
-case object JacobianMatrix {
-  def apply(nodeAmount: Int): JacobianMatrix = {
-    new JacobianMatrix(
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-      DenseMatrix.zeros(nodeAmount, nodeAmount),
-    )
-  }
+object JacobianMatrix {
 
-  /** Building the jacobian matrix for Taylor series calculation
+  /** Method for calculating the jacobian matrix.
+    * @param indexMapping
+    *   Information for mapping the index.
     * @param lastState
-    *   The last known state of the grid
+    *   The last state of the calculation.
     * @param admittanceMatrix
-    *   The dimensionless admittance matrix describing the grid structure
+    *   The complex admittance matrix.
     * @return
-    *   A [[DenseMatrix]] describing the gradients in each direction
+    *   The jacobian matrix.
     */
   def buildJacobianMatrix(
+      indexMapping: IndexMapping,
       lastState: Array[StateData],
       admittanceMatrix: DenseMatrix[Complex],
   ): DenseMatrix[Double] = {
     val voltages = StateData.extractVoltageVector(lastState)
-    val nodeCount = admittanceMatrix.rows
-    val fullMatrix = JacobianMatrix(nodeCount)
+
+    val countNoSlack = indexMapping.nodeCountWithoutSlack
+    val countNoSlackAndPV = indexMapping.nodeCountPQ
+    val countNoSlackAndPQ = indexMapping.nodeCountPV
+
+    val indexesWithoutSlack = indexMapping.indexesWithoutSlack
+    val indexesWithoutSlackAndPV = indexMapping.indexesWithoutSlackAndPV
+    val indexesWithoutSlackAndPQ = indexMapping.indexesWithoutSlackAndPQ
+
+    val dim = 2 * countNoSlack
+    val fullMatrix: DenseMatrix[Double] = DenseMatrix.zeros(dim, dim)
+
+    val (gif, bie, gie, bif) = getSums(admittanceMatrix, voltages)
+
+    // offsets
+    val offsetJ3 = countNoSlack
+    val offsetJ5 = offsetJ3 + countNoSlackAndPV
+    val offsetJ2 = dim * countNoSlack
+    val offsetJ4 = offsetJ2 + countNoSlack
+    val offsetJ6 = offsetJ4 + countNoSlackAndPV
 
     for
-      row <- 0 until nodeCount; rowType = lastState(row).nodeType;
-      col <- 0 until nodeCount
+      row <- 0 until countNoSlack
+      col <- 0 until countNoSlack
     do {
-      rowType match {
-        case NodeType.PQ | NodeType.PQ_INTERMEDIATE | NodeType.PV =>
-          val gij = admittanceMatrix.valueAt(row, col).real
-          val bij = admittanceMatrix.valueAt(row, col).imag
-          val ei = voltages(row).real
-          val ej = voltages(col).real
-          val fi = voltages(row).imag
-          val fj = voltages(col).imag
-          if row == col then {
-            fullMatrix.dPdF(row, col) += 2 * fi * gij // dPi/dfi
-            fullMatrix.dPdE(row, col) += 2 * ei * gij // dPi/dei
-            fullMatrix.dQdF(row, col) += -2 * fi * bij // dQi/dfi
-            fullMatrix.dQdE(row, col) += -2 * ei * bij // dQi/dei
-            fullMatrix.dV2dF(row, col) += 2 * fi // dU²i/dfi
-            fullMatrix.dV2dE(row, col) += 2 * ei // dU²i/dei
-          } else {
-            fullMatrix.dPdF(row, col) += -ei * bij + fi * gij // dPi/dfj
-            fullMatrix.dPdF(row, row) += fj * gij + ej * bij // dPi/dfi
-            fullMatrix.dPdE(row, col) += ei * gij + fi * bij // dPi/dej
-            fullMatrix.dPdE(row, row) += ej * gij - fj * bij // dPi/dei
-            fullMatrix.dQdF(row, col) += -fi * bij - ei * gij // dQi/dfj
-            fullMatrix.dQdF(row, row) += ej * gij - fj * bij // dQi/dfi
-            fullMatrix.dQdE(row, col) += fi * gij - ei * bij // dQi/dej
-            fullMatrix.dQdE(row, row) += -(fj * gij + ej * bij) // dQi/dei
-          }
-        case NodeType.SL => /* Leave out the line of the slack node */
+      val oldRow = indexesWithoutSlack(row)
+      val oldCol = indexesWithoutSlack(col)
+
+      val c = admittanceMatrix.valueAt(oldRow, oldCol)
+      val bij = c.imag
+      val gij = c.real
+
+      val v = voltages(oldRow)
+      val fi = v.imag
+      val ei = v.real
+
+      val (rowJ1, colJ1) = calculateActualIndex(row, col, dim, 0)
+      val (rowJ2, colJ2) = calculateActualIndex(row, col, dim, offsetJ2)
+
+      fullMatrix(rowJ1, colJ1) = -ei * bij + fi * gij
+      fullMatrix(rowJ2, colJ2) = ei * gij + fi * bij
+
+      if row == col then {
+        fullMatrix(rowJ1, colJ1) += gif(oldRow) + bie(oldRow)
+        fullMatrix(rowJ2, colJ2) += gie(oldRow) - bif(oldRow)
       }
     }
 
-    /* Reduce the matrix by deleting the unneeded columns and rows */
-    val slIdx = lastState
-      .filter(_.nodeType == NodeType.SL)
-      .map(_.index)
-      .toIndexedSeq
-    val pqIdx = lastState
-      .filter(_.nodeType == NodeType.PQ)
-      .map(_.index)
-      .toIndexedSeq
-    val pvIdx = lastState
-      .filter(_.nodeType == NodeType.PV)
-      .map(_.index)
-      .toIndexedSeq
+    for
+      row <- 0 until countNoSlackAndPV
+      col <- 0 until countNoSlack
+    do {
+      val oldRow = indexesWithoutSlackAndPV(row)
+      val oldCol = indexesWithoutSlack(col)
 
-    JacobianMatrix.reduceAndCombine(fullMatrix, slIdx, pqIdx, pvIdx)
+      val c = admittanceMatrix.valueAt(oldRow, oldCol)
+      val bij = c.imag
+      val gij = c.real
+
+      val v = voltages(oldRow)
+      val fi = v.imag
+      val ei = v.real
+
+      val (rowJ3, colJ3) = calculateActualIndex(row, col, dim, offsetJ3)
+      val (rowJ4, colJ4) = calculateActualIndex(row, col, dim, offsetJ4)
+
+      fullMatrix(rowJ3, colJ3) = -ei * gij - fi * bij
+      fullMatrix(rowJ4, colJ4) = -ei * bij + fi * gij
+
+      if row == col then {
+        fullMatrix(rowJ3, colJ3) =
+          -fi * bij + gie(oldRow) - bif(oldRow) - ei * gij
+        fullMatrix(rowJ4, colJ4) =
+          -ei * bij - gif(oldRow) - bie(oldRow) + fi * gij
+      }
+    }
+
+    val pqOffset = indexMapping.nodeCountPQ - 1
+    for
+      row <- 0 until countNoSlackAndPQ
+      col <- 0 until countNoSlack
+    do {
+
+      if row == col then {
+        val v = voltages(indexesWithoutSlackAndPV(row))
+
+        val (rowJ5, colJ5) =
+          calculateActualIndex(row, col + pqOffset, dim, offsetJ5)
+        val (rowJ6, colJ6) =
+          calculateActualIndex(row, col + pqOffset, dim, offsetJ6)
+
+        fullMatrix(rowJ5, colJ5) = 2 * v.imag
+        fullMatrix(rowJ6, colJ6) = 2 * v.real
+      }
+    }
+
+    fullMatrix
   }
 
-  /** Finally build the jacobian matrix based on the sub matrices of partial
-    * deviations. The final form is:
-    *
-    * dPdF | dPdE ------------- dQdF | dQdF ------------- dV2dF | dV2dE
-    *
-    * To represent the correct linearised equations of the grid, several rows
-    * and columns have to be deleted: 1) The columns at the position of the
-    * slack node 2) In all submatrices => The row of the slack node 3) In dQd*
-    * \=> The rows of the voltage regulated nodes (PV nodes) 4) In dV2d* => The
-    * rows of the nodes with fixed power (PQ nodes)
-    *
-    * @param matrix
-    *   The matrices to concatenate
-    * @param slIdx
-    *   Indices of the slack nodes
-    * @param pqIdx
-    *   Indices of the PQ nodes
-    * @param pvIdx
-    *   Indices of the PV nodes
+  /** Method to calculat the index inside the full matrix based on the index of
+    * the submatrix.
+    * @param row
+    *   The row of the submatrix.
+    * @param col
+    *   The column of the submatrix.
+    * @param cols
+    *   The number of columns in the full matrix.
+    * @param offset
+    *   The offset for the submatrix.
     * @return
-    *   The concatenated total jacobian matrix
+    *   The row and column of the element in the full matrix.
     */
-  private def reduceAndCombine(
-      matrix: JacobianMatrix,
-      slIdx: IndexedSeq[Int],
-      pqIdx: IndexedSeq[Int],
-      pvIdx: IndexedSeq[Int],
-  ): DenseMatrix[Double] = {
-    val dP = DenseMatrix
-      .horzcat(
-        matrix.dPdF.delete(slIdx, Axis._1),
-        matrix.dPdE.delete(slIdx, Axis._1),
-      )
-      .delete(slIdx, Axis._0)
-    val dQ = DenseMatrix
-      .horzcat(
-        matrix.dQdF.delete(slIdx, Axis._1),
-        matrix.dQdE.delete(slIdx, Axis._1),
-      )
-      .delete(slIdx ++ pvIdx, Axis._0)
-    val dV2 = DenseMatrix
-      .horzcat(
-        matrix.dV2dF.delete(slIdx, Axis._1),
-        matrix.dV2dE.delete(slIdx, Axis._1),
-      )
-      .delete(slIdx ++ pqIdx, Axis._0)
+  private def calculateActualIndex(
+      row: Int,
+      col: Int,
+      cols: Int,
+      offset: Int,
+  ): (Int, Int) = {
+    val linIdx = col * cols + row + offset
 
-    (dQ.rows, dV2.rows) match {
-      case (0, 0) =>
-        throw new PowerFlowException(
-          "There are neither submatrices for PQ as well as for PV nodes."
-        )
-      case (_, 0) => DenseMatrix.vertcat(dP, dQ)
-      case (0, _) => DenseMatrix.vertcat(dP, dV2)
-      case _ =>
-        DenseMatrix.vertcat(
-          DenseMatrix.vertcat(dP, dQ),
-          dV2,
-        )
+    val r = linIdx % cols
+    val c = linIdx / cols
+
+    (r, c)
+  }
+
+  /** Method for calculating some common sums.
+    * @param matrix
+    *   The complex admittance matrix.
+    * @param voltages
+    *   The complex voltage vector.
+    * @return
+    *   The following vectors: G(i,:)*f , B(i,:)*e , G(i,:)*e , B(i,:)*f
+    */
+  private def getSums(
+      matrix: DenseMatrix[Complex],
+      voltages: DenseVector[Complex],
+  ): (
+      DenseVector[Double],
+      DenseVector[Double],
+      DenseVector[Double],
+      DenseVector[Double],
+  ) = {
+    val size = voltages.size
+
+    val gif: DenseVector[Double] = DenseVector.zeros(size)
+    val bie: DenseVector[Double] = DenseVector.zeros(size)
+    val gie: DenseVector[Double] = DenseVector.zeros(size)
+    val bif: DenseVector[Double] = DenseVector.zeros(size)
+
+    matrix.activeIterator.foreach { case ((i, _), value) =>
+      val vi = voltages(i)
+      val fi = vi.imag
+      val ei = vi.real
+      val bij = value.imag
+      val gij = value.real
+
+      gif(i) += gij * fi
+      bie(i) += bij * ei
+      gie(i) += gij * ei
+      bif(i) += bij * fi
     }
+
+    (gif, bie, gie, bif)
   }
 }

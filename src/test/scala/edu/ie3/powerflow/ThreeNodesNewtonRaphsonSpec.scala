@@ -121,7 +121,12 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
     "calculate the final power flow correctly" in {
       val method =
         PrivateMethod[PowerFlowResult](Symbol("solveIterationStepsRecursively"))
-      val actual = nr invokePrivate method(0, operationPoint, initialState)
+      val actual = nr invokePrivate method(
+        0,
+        indexMapping,
+        operationPoint,
+        initialState,
+      )
 
       val eval = actual match {
         case validResult: ValidNewtonRaphsonPFResult =>

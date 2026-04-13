@@ -44,36 +44,32 @@ object NodeData extends LazyLogging {
       )
   }
 
-  /** Aligns the order of a given input array with the predefined order
+  /** Aligns the order of a given input array with the predefined order.
     *
     * @param unordered
-    *   (Possibly) unordered input array
-    * @param intendedOrder
-    *   Optional intended order
+    *   (Possibly) unordered input array.
+    * @param order
+    *   The intended order.
     * @tparam T
     *   Type parameter
     * @param ct
-    *   Class tag of the generic type
+    *   Class tag of the generic type.
     * @return
     *   An Array, whose order is aligned with the intended order, if some is
-    *   provided
+    *   provided.
     */
   def correctOrder[T <: NodeData](
       unordered: Array[T],
-      intendedOrder: Option[Vector[Int]],
+      order: IndexedSeq[Int],
   )(implicit ct: ClassTag[T]): Array[T] = {
-    intendedOrder match {
-      case None =>
-        logger.debug(
-          "There is no intended order provided, cannot correct the order!"
-        )
-        unordered
-      case Some(order) if order.length != unordered.length =>
-        throw new PowerFlowException(
-          s"The provided data has not the expected length (expected = ${order.length}, actual = ${unordered.length})"
-        )
-      case Some(order) =>
-        order.map(index => getByIndex(unordered, index)).toArray
+
+    if order.length != unordered.length then {
+      throw new PowerFlowException(
+        s"The provided data has not the expected length (expected = ${order.length}, actual = ${unordered.length})"
+      )
+    } else {
+      val mappedToIndex = unordered.map(n => n.index -> n).toMap
+      order.map(mappedToIndex).toArray
     }
   }
 
