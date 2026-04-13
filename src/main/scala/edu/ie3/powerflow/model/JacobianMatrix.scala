@@ -17,7 +17,7 @@ object JacobianMatrix {
 
   /** Method for calculating the jacobian matrix.
     * @param indexMapping
-    *   Information for correction of the index.
+    *   Information for mapping the index.
     * @param lastState
     *   The last state of the calculation.
     * @param admittanceMatrix
