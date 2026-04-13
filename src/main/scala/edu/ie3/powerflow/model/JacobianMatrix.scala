@@ -16,7 +16,7 @@ import scala.reflect.ClassTag
 object JacobianMatrix {
 
   /** Method for calculating the jacobian matrix.
-    * @param indexCorrection
+    * @param indexMapping
     *   Information for correction of the index.
     * @param lastState
     *   The last state of the calculation.
@@ -26,20 +26,19 @@ object JacobianMatrix {
     *   The jacobian matrix.
     */
   def buildJacobianMatrix(
-      indexCorrection: IndexCorrection,
+      indexMapping: IndexMapping,
       lastState: Array[StateData],
       admittanceMatrix: DenseMatrix[Complex],
   ): DenseMatrix[Double] = {
     val voltages = StateData.extractVoltageVector(lastState)
-    val nodeCount = admittanceMatrix.rows
 
-    val countNoSlack = indexCorrection.nodeCountWithoutSlack
-    val countNoSlackAndPV = indexCorrection.nodeCountWithoutSlackAndPV
-    val countNoSlackAndPQ = indexCorrection.nodeCountWithoutSlackAndPQ
+    val countNoSlack = indexMapping.nodeCountWithoutSlack
+    val countNoSlackAndPV = indexMapping.nodeCountPQ
+    val countNoSlackAndPQ = indexMapping.nodeCountPV
 
-    val indexesWithoutSlack = indexCorrection.indexesWithoutSlack
-    val indexesWithoutSlackAndPV = indexCorrection.indexesWithoutSlackAndPV
-    val indexesWithoutSlackAndPQ = indexCorrection.indexesWithoutSlackAndPQ
+    val indexesWithoutSlack = indexMapping.indexesWithoutSlack
+    val indexesWithoutSlackAndPV = indexMapping.indexesWithoutSlackAndPV
+    val indexesWithoutSlackAndPQ = indexMapping.indexesWithoutSlackAndPQ
 
     val dim = 2 * countNoSlack
     val fullMatrix: DenseMatrix[Double] = DenseMatrix.zeros(dim, dim)
@@ -109,7 +108,7 @@ object JacobianMatrix {
       }
     }
 
-    val pqOffset = indexCorrection.countPQ - 1
+    val pqOffset = indexMapping.countPQ - 1
     for
       row <- 0 until countNoSlackAndPQ
       col <- 0 until countNoSlack
@@ -144,7 +143,7 @@ object JacobianMatrix {
     * @return
     *   The row and column of the element in the full matrix.
     */
-  def calculateActualIndex(
+  private def calculateActualIndex(
       row: Int,
       col: Int,
       cols: Int,
@@ -166,7 +165,10 @@ object JacobianMatrix {
     * @return
     *   The following vectors: G(i,:)*f , B(i,:)*e , G(i,:)*e , B(i,:)*f
     */
-  def getSums(matrix: DenseMatrix[Complex], voltages: DenseVector[Complex]): (
+  private def getSums(
+      matrix: DenseMatrix[Complex],
+      voltages: DenseVector[Complex],
+  ): (
       DenseVector[Double],
       DenseVector[Double],
       DenseVector[Double],

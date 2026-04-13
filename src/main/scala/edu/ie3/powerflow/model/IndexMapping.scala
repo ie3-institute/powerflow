@@ -8,22 +8,31 @@ package edu.ie3.powerflow.model
 
 import edu.ie3.powerflow.model.enums.NodeType.{PQ, PQ_INTERMEDIATE, PV, SL}
 
-// maps new index to old index
-final case class IndexCorrection(
+/** Mapping between the index in the admittance matrix and the index with some
+  * of the nodes. This is used to reduce the number of needed calculations for
+  * the jacobian matrix.
+  * @param indexesWithoutSlack
+  *   Maps the full index to the index without slack nodes.
+  * @param indexesWithoutSlackAndPV
+  *   Maps the full index to the index of only PV and PQ_INTERMEDIATE nodes.
+  * @param indexesWithoutSlackAndPQ
+  *   Maps the full index to the index of only PQ nodes.
+  */
+final case class IndexMapping(
     indexesWithoutSlack: Map[Int, Int],
     indexesWithoutSlackAndPV: Map[Int, Int],
     indexesWithoutSlackAndPQ: Map[Int, Int],
 ) {
 
   val nodeCountWithoutSlack: Int = indexesWithoutSlack.size
-  val nodeCountWithoutSlackAndPV: Int = indexesWithoutSlackAndPV.size
-  val nodeCountWithoutSlackAndPQ: Int = indexesWithoutSlackAndPQ.size
-  val countPQ: Int = nodeCountWithoutSlackAndPV
+  val nodeCountPQ: Int = indexesWithoutSlackAndPV.size
+  val nodeCountPV: Int = indexesWithoutSlackAndPQ.size
+  val countPQ: Int = nodeCountPQ
 }
 
-object IndexCorrection {
+object IndexMapping {
 
-  def apply(data: Array[? <: NodeData]): IndexCorrection = {
+  def apply(data: Array[? <: NodeData]): IndexMapping = {
     val indexesWithoutSlack = data
       .filterNot(_.nodeType == SL)
       .zipWithIndex
@@ -42,7 +51,7 @@ object IndexCorrection {
       .map { case (n, idx) => idx -> n.index }
       .toMap
 
-    new IndexCorrection(
+    new IndexMapping(
       indexesWithoutSlack,
       indexesWithoutSlackAndPV,
       indexesWithoutSlackAndPQ,

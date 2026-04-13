@@ -19,7 +19,7 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
       val method =
         PrivateMethod[DenseMatrix[Double]](Symbol("buildJacobianMatrix"))
       val actual = JacobianMatrix invokePrivate method(
-        indexCorrections,
+        indexMapping,
         initialState,
         admittanceMatrix,
       )

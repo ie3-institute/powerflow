@@ -25,7 +25,7 @@ class SixNodesNewtonRaphsonQLimitSpec extends UnitSpec with SixNodesTestData {
         PrivateMethod[PowerFlowResult](Symbol("solveIterationStepsRecursively"))
       val actual = nr invokePrivate method(
         0,
-        indexCorrection,
+        indexMapping,
         operationPoint,
         initialState,
       )

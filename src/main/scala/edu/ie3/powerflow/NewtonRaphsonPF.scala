@@ -34,8 +34,7 @@ import scala.util.{Failure, Success, Try}
   *
   * ATTENTION: It is the users responsibility, that the data fed in here and in
   * the calculate method actually does fit together in terms of the node
-  * indices. A sanity check is done when feeding something in, but it is not
-  * possible to detect all logical failures.
+  * indices.
   *
   * @param epsilon
   *   Permissible deviation between actual (given) use of the grid (P, Q, |V|)
@@ -74,7 +73,7 @@ final case class NewtonRaphsonPF(
       operationPoint: Array[PresetData],
       initData: Option[StartData] = None,
   ): PowerFlowResult = {
-    val indexCorrection = IndexCorrection(operationPoint)
+    val indexMapping = IndexMapping(operationPoint)
 
     val startData: Array[StateData] =
       NewtonRaphsonPF.getInitialState(operationPoint, initData)
@@ -82,7 +81,7 @@ final case class NewtonRaphsonPF(
     /* Solve the inner iterations recursively */
     solveIterationStepsRecursively(
       0,
-      indexCorrection,
+      indexMapping,
       operationPoint,
       startData,
     )
@@ -92,7 +91,7 @@ final case class NewtonRaphsonPF(
     *
     * @param iterationCount
     *   Current number of iterations
-    * @param indexCorrection
+    * @param indexMapping
     *   Information for correction of the index.
     * @param operationPoint
     *   Given operation point, with which the grid is used
@@ -104,7 +103,7 @@ final case class NewtonRaphsonPF(
   @tailrec
   private def solveIterationStepsRecursively(
       iterationCount: Integer = 0,
-      indexCorrection: IndexCorrection,
+      indexMapping: IndexMapping,
       operationPoint: Array[PresetData],
       lastState: Array[StateData],
   ): PowerFlowResult = {
@@ -128,7 +127,7 @@ final case class NewtonRaphsonPF(
     val converged = deviationVector.forall(abs(_) < epsilon)
     val jacobianMatrix =
       JacobianMatrix.buildJacobianMatrix(
-        indexCorrection,
+        indexMapping,
         lastStateWithIterationPower,
         admittanceMatrix,
       )
@@ -151,7 +150,7 @@ final case class NewtonRaphsonPF(
           if !converged && iterationCount < maxIterations =>
         solveIterationStepsRecursively(
           iterationCount + 1,
-          indexCorrection,
+          indexMapping,
           operationPoint,
           correctedState,
         )

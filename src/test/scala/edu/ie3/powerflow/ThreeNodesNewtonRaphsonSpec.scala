@@ -123,7 +123,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
         PrivateMethod[PowerFlowResult](Symbol("solveIterationStepsRecursively"))
       val actual = nr invokePrivate method(
         0,
-        indexCorrections,
+        indexMapping,
         operationPoint,
         initialState,
       )

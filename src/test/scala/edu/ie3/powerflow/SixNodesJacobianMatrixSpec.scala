@@ -21,7 +21,7 @@ class SixNodesJacobianMatrixSpec extends UnitSpec with SixNodesTestData {
         PrivateMethod[DenseMatrix[Double]](Symbol("buildJacobianMatrix"))
 
       val actual = JacobianMatrix invokePrivate method(
-        indexCorrection,
+        indexMapping,
         initialState,
         admittanceMatrix,
       )
