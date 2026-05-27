@@ -6,14 +6,15 @@
 
 package edu.ie3.powerflow
 
-import breeze.linalg.DenseVector
-import breeze.numerics.abs
+import edu.ie3.powerflow.math.{DenseVector, Complex}
 import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.SixNodesTestData
+
+import scala.math.abs
 
 class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
   val tolerance = 1e-12
@@ -34,7 +35,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
         admittanceMatrix,
       )
 
-      val eval = (actual zip expectedLastStateWitIteratedPower).forall(
+      val eval = actual.zip(expectedLastStateWitIteratedPower).forall(
         actualVsExpected =>
           abs(
             actualVsExpected._1.power.real - actualVsExpected._2.power.real
@@ -60,7 +61,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
       )
 
       val eval =
-        expectedDeviation.zipWithIndex.foldLeft(true)((eval, currentEntry) => {
+        expectedDeviation.zipWithIndex.foldLeft(true) { case (eval, currentEntry) =>
           eval && (currentEntry._1.power.real - actual(
             currentEntry._2
           ).power.real).abs < testTolerance && (currentEntry._1.power.imag - actual(
@@ -70,7 +71,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
               currentEntry._2
             ).squaredVoltageMagnitude
           ) < testTolerance
-        })
+        }
 
       eval should be(true)
     }
@@ -85,7 +86,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
       actual.length should be(2 * nodeCount - 2)
 
       val eval =
-        expectedDeviationVector.toScalaVector.zipWithIndex
+        expectedDeviationVector.toArray.zipWithIndex
           .forall(currentEntry =>
             (currentEntry._1 - actual(currentEntry._2)).abs < 1e-4
           )

@@ -6,8 +6,7 @@
 
 package edu.ie3.test.common.powerflow
 
-import breeze.linalg.DenseMatrix
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseMatrix, Complex}
 import edu.ie3.powerflow.model.NodeData.{PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
 
@@ -27,7 +26,7 @@ import edu.ie3.powerflow.model.enums.NodeType
   */
 trait SixNodesQLimitTestData {
   protected val admittanceMatrix: DenseMatrix[Complex] = DenseMatrix(
-    (
+    Seq(
       Complex(1146.24153, -933.77229),
       Complex(-458.49661, 373.51212),
       Complex.zero,
@@ -35,7 +34,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex(-458.49661, 373.51212),
       Complex(802.36907, -653.63491),
       Complex(-343.87246, 280.13409),
@@ -43,7 +42,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex.zero,
       Complex(-343.87246, 280.13409),
       Complex(343.87246, -280.12759),
@@ -51,7 +50,7 @@ trait SixNodesQLimitTestData {
       Complex.zero,
       Complex.zero,
     ),
-    (
+    Seq(
       Complex(-687.74492, 560.26817),
       Complex.zero,
       Complex.zero,
@@ -59,7 +58,7 @@ trait SixNodesQLimitTestData {
       Complex(-1375.48984, 1120.53635),
       Complex(-275.09797, 224.10727),
     ),
-    (
+    Seq(
       Complex.zero,
       Complex.zero,
       Complex.zero,
@@ -67,7 +66,7 @@ trait SixNodesQLimitTestData {
       Complex(1375.48984, -1120.53475),
       Complex.zero,
     ),
-    (
+    Seq(
       Complex.zero,
       Complex.zero,
       Complex.zero,

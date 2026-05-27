@@ -6,9 +6,8 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.DenseVector
-import breeze.math.Complex
 import com.typesafe.scalalogging.LazyLogging
+import edu.ie3.powerflow.math.{Complex, DenseVector}
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
 

@@ -6,7 +6,7 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.DenseMatrix
+import edu.ie3.powerflow.math.DenseMatrix
 import edu.ie3.powerflow.model.NodeData.StateData
 
 sealed trait PowerFlowResult {
