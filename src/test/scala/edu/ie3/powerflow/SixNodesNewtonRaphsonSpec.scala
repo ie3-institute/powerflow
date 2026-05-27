@@ -35,14 +35,15 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
         admittanceMatrix,
       )
 
-      val eval = actual.zip(expectedLastStateWitIteratedPower).forall(
-        actualVsExpected =>
+      val eval = actual
+        .zip(expectedLastStateWitIteratedPower)
+        .forall(actualVsExpected =>
           abs(
             actualVsExpected._1.power.real - actualVsExpected._2.power.real
           ) < testTolerance && abs(
             actualVsExpected._1.power.imag - actualVsExpected._2.power.imag
           ) < testTolerance
-      )
+        )
 
       eval should be(true)
     }
@@ -61,16 +62,17 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
       )
 
       val eval =
-        expectedDeviation.zipWithIndex.foldLeft(true) { case (eval, currentEntry) =>
-          eval && (currentEntry._1.power.real - actual(
-            currentEntry._2
-          ).power.real).abs < testTolerance && (currentEntry._1.power.imag - actual(
-            currentEntry._2
-          ).power.imag).abs < testTolerance && abs(
-            currentEntry._1.squaredVoltageMagnitude - actual(
+        expectedDeviation.zipWithIndex.foldLeft(true) {
+          case (eval, currentEntry) =>
+            eval && (currentEntry._1.power.real - actual(
               currentEntry._2
-            ).squaredVoltageMagnitude
-          ) < testTolerance
+            ).power.real).abs < testTolerance && (currentEntry._1.power.imag - actual(
+              currentEntry._2
+            ).power.imag).abs < testTolerance && abs(
+              currentEntry._1.squaredVoltageMagnitude - actual(
+                currentEntry._2
+              ).squaredVoltageMagnitude
+            ) < testTolerance
         }
 
       eval should be(true)

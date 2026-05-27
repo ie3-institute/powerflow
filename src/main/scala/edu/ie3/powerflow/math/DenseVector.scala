@@ -6,7 +6,12 @@
 
 package edu.ie3.powerflow.math
 
-import edu.ie3.powerflow.math.NumericOperations.{Mul, MulElementWise, Split, Sub}
+import edu.ie3.powerflow.math.NumericOperations.{
+  Mul,
+  MulElementWise,
+  Split,
+  Sub,
+}
 
 import scala.reflect.ClassTag
 
@@ -57,7 +62,7 @@ object DenseVector {
     val length = xs.size
     new DenseVector(length, xs.toArray)
   }
-  
+
   given SPLIT_CV
       : Split[DenseVector[Complex], DenseVector[Double], DenseVector[Double]] =
     vec => {

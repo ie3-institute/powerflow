@@ -13,19 +13,23 @@ trait NumericOperations[V1] {
 
   def +[V2, R](that: V2)(using op: Add[V1, V2, R]): R = op(this, that)
 
-  def +:+[V2, R](that: V2)(using op: AddElementWise[V1, V2, R]): R = op(this, that)
+  def +:+[V2, R](that: V2)(using op: AddElementWise[V1, V2, R]): R =
+    op(this, that)
 
   def -[V2, R](that: V2)(using op: Sub[V1, V2, R]): R = op(this, that)
 
-  def -:-[V2, R](that: V2)(using op: SubElementWise[V1, V2, R]): R = op(this, that)
+  def -:-[V2, R](that: V2)(using op: SubElementWise[V1, V2, R]): R =
+    op(this, that)
 
   def *[V2, R](that: V2)(using op: Mul[V1, V2, R]): R = op(this, that)
 
-  def *:*[V2, R](vec: V2)(using op: MulElementWise[V1, V2, R]): R = op(this, vec)
+  def *:*[V2, R](vec: V2)(using op: MulElementWise[V1, V2, R]): R =
+    op(this, vec)
 
   def /[V2, R](that: V2)(using op: Mul[V1, V2, R]): R = op(this, that)
 
-  def /:/[V2, R](vec: V2)(using op: MulElementWise[V1, V2, R]): R = op(this, vec)
+  def /:/[V2, R](vec: V2)(using op: MulElementWise[V1, V2, R]): R =
+    op(this, vec)
 
   def split[R1, R2](using op: Split[V1, R1, R2]): (R1, R2) = op(this)
 

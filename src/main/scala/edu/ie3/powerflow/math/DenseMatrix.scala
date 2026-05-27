@@ -75,7 +75,9 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
     }
   }
 
-  def iterator: Iterator[((Int, Int), V)] = data.zipWithIndex.map { case (value, idx) => (rowAndColumnFromLinearIndex(idx), value) }.iterator
+  def iterator: Iterator[((Int, Int), V)] = data.zipWithIndex.map {
+    case (value, idx) => (rowAndColumnFromLinearIndex(idx), value)
+  }.iterator
 
   def columnIterator: Iterator[DenseVector[V]] = if !isTransposed then {
     data.grouped(cols).map(DenseVector.apply)
@@ -131,10 +133,11 @@ object DenseMatrix {
     val nRows = rows.length
     val nCols = rows.headOption match {
       case Some(firstRow) => firstRow.length
-      case None => 0
+      case None           => 0
     }
 
-    val matrix = new DenseMatrix(nRows, nCols, Array.ofDim(nRows * nCols), nCols)
+    val matrix =
+      new DenseMatrix(nRows, nCols, Array.ofDim(nRows * nCols), nCols)
 
     rows.zipWithIndex.foreach { case (rowData, row) =>
       rowData.zipWithIndex.foreach { case (value, col) =>
@@ -171,15 +174,17 @@ object DenseMatrix {
       (real, imag)
     }
 
-  given SUB_DMDM: Sub[DenseMatrix[Double], DenseMatrix[Double], DenseMatrix[Double]] = (matrix1, matrix2) => {
-    val res = DenseMatrix.filled(matrix1.rows, matrix1.cols, 0d)
+  given SUB_DMDM
+      : Sub[DenseMatrix[Double], DenseMatrix[Double], DenseMatrix[Double]] =
+    (matrix1, matrix2) => {
+      val res = DenseMatrix.filled(matrix1.rows, matrix1.cols, 0d)
 
-    matrix1.iterator.foreach { case ((row, col), value) =>
-     res(row, col) = value - matrix2(row, col)
+      matrix1.iterator.foreach { case ((row, col), value) =>
+        res(row, col) = value - matrix2(row, col)
+      }
+
+      res
     }
-
-    res
-  }
 
   given MUL_RMRV
       : Mul[DenseMatrix[Double], DenseVector[Double], DenseVector[Double]] =
@@ -187,7 +192,19 @@ object DenseMatrix {
       val trans = if matrix.isTransposed then "T" else "N"
       val y = DenseVector.filled(vec.length, 0d)
 
-      blas.dgemv(trans, matrix.rows, matrix.cols, 1.0, matrix.data, matrix.rows, vec.toArray, 1, 0.0, y.toArray, 1)
+      blas.dgemv(
+        trans,
+        matrix.rows,
+        matrix.cols,
+        1.0,
+        matrix.data,
+        matrix.rows,
+        vec.toArray,
+        1,
+        0.0,
+        y.toArray,
+        1,
+      )
 
       y
     }
