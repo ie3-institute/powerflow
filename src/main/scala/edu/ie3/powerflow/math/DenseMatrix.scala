@@ -38,17 +38,6 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
     val isTransposed: Boolean = false,
 ) extends NumericOperations[DenseMatrix[V]] {
 
-  private def checkIndex(row: Int, col: Int): Unit = {
-    if row < 0 || row >= rows then
-      throw new IndexOutOfBoundsException(
-        s"${(row, col)} not in [0,$rows) x [0,$cols)"
-      )
-    if col < 0 || col >= cols then
-      throw new IndexOutOfBoundsException(
-        s"${(row, col)} not in [0,$rows) x [0,$cols)"
-      )
-  }
-
   def apply(row: Int, col: Int): V = data(linearIndex(row, col))
 
   def update(row: Int, col: Int, value: V): Unit = {
@@ -123,10 +112,15 @@ object DenseMatrix {
   private lazy val blas = BLAS.getInstance()
   private lazy val lapack = LAPACK.getInstance()
 
-  def filled[V: ClassTag](rows: Int, cols: Int, value: V): DenseMatrix[V] = {
+  def filled[V: ClassTag](
+      rows: Int,
+      cols: Int,
+      value: V,
+      isTransposed: Boolean = false,
+  ): DenseMatrix[V] = {
     val length = cols * rows
     val data = Array.fill(length)(value)
-    new DenseMatrix(cols, rows, data, rows)
+    new DenseMatrix(cols, rows, data, rows, isTransposed)
   }
 
   def apply[R <: Seq[V], V: ClassTag](rows: R*): DenseMatrix[V] = {
@@ -154,17 +148,8 @@ object DenseMatrix {
       val cols = matrix.cols
       val rows = matrix.rows
 
-      val (real, imag) = if matrix.isTransposed then {
-        (
-          filled(cols, rows, 0d),
-          filled(cols, rows, 0d),
-        )
-      } else {
-        (
-          filled(cols, rows, 0d),
-          filled(cols, rows, 0d),
-        )
-      }
+      val real = filled(cols, rows, 0d, matrix.isTransposed)
+      val imag = filled(cols, rows, 0d, matrix.isTransposed)
 
       matrix.foreach { case ((col, row), value) =>
         real(row, col) = value.real
