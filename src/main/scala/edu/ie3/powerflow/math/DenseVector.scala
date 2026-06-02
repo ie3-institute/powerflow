@@ -40,7 +40,7 @@ class DenseVector[@specialized(Double) V: ClassTag](
     new DenseVector(length, data.map(f))
 
   def foreach[U](f: (Int, V) => U): Unit =
-    data.zipWithIndex.iterator.map { case (value, idx) =>
+    data.zipWithIndex.foreach { case (value, idx) =>
       f(idx, value)
     }
 

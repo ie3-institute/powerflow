@@ -6,13 +6,14 @@
 
 package edu.ie3.powerflow.math
 
+import edu.ie3.powerflow.math.DenseMatrix.filled
 import edu.ie3.test.common.UnitSpec
 
 class DenseMatrixSpec extends UnitSpec {
 
   "A DenseMatrix" should {
     "be updated correctly" in {
-      val matrix = DenseMatrix.filled(3, 3, 0d)
+      val matrix = filled(3, 3, 0d)
       matrix.forall(_ == 0d) shouldBe true
 
       matrix(2, 2) = 5
@@ -22,7 +23,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "calculate the correct linear index correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d)
+      val matrix = filled(3, 4, 0d)
 
       matrix.linearIndex(0, 0) shouldBe 0
       matrix.linearIndex(1, 0) shouldBe 1
@@ -39,7 +40,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "calculate the correct linear index for a transposed matrix correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d, true)
+      val matrix = filled(3, 4, 0d, true)
 
       matrix.linearIndex(0, 0) shouldBe 0
       matrix.linearIndex(0, 1) shouldBe 1
@@ -56,7 +57,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "calculate the row and column from a linear index correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d)
+      val matrix = filled(3, 4, 0d)
 
       matrix.rowAndColumnFromLinearIndex(0) shouldBe (0, 0)
       matrix.rowAndColumnFromLinearIndex(1) shouldBe (1, 0)
@@ -73,7 +74,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "calculate the row and column from a linear index for a transposed matrix correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d, true)
+      val matrix = filled(3, 4, 0d, true)
 
       matrix.rowAndColumnFromLinearIndex(0) shouldBe (0, 0)
       matrix.rowAndColumnFromLinearIndex(1) shouldBe (0, 1)
@@ -90,7 +91,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return an iterator correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d)
+      val matrix = filled(3, 4, 0d)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -114,7 +115,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return an iterator for a transposed matrix correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d, true)
+      val matrix = filled(3, 4, 0d, true)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -138,7 +139,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return a column iterator correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d)
+      val matrix = filled(3, 4, 0d)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -153,7 +154,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return a column iterator for a transposed matrix correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d, true)
+      val matrix = filled(3, 4, 0d, true)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -167,7 +168,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return a row iterator correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d)
+      val matrix = filled(3, 4, 0d)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -181,7 +182,7 @@ class DenseMatrixSpec extends UnitSpec {
     }
 
     "return a row iterator for a transposed matrix correctly" in {
-      val matrix = DenseMatrix.filled(3, 4, 0d, true)
+      val matrix = filled(3, 4, 0d, true)
 
       for i <- 0 until matrix.linearSize do {
         val (r, c) = matrix.rowAndColumnFromLinearIndex(i)
@@ -193,6 +194,24 @@ class DenseMatrixSpec extends UnitSpec {
       list(1).data shouldBe Array(3, 4, 5)
       list(2).data shouldBe Array(6, 7, 8)
       list(3).data shouldBe Array(9, 10, 11)
+    }
+
+    "use map correctly" in {
+      val matrix = filled(3, 4, 0d)
+      val updatedMatrix = matrix.map(_ + Complex.i)
+      updatedMatrix.forall(_ == Complex(0, 1))
+    }
+
+    "use foreach correctly" in {
+      val matrix = filled(3, 4, 1d)
+      val array = Array.fill(12)(1d)
+
+      matrix.foreach { case ((row, col), value) =>
+        val i = matrix.linearIndex(row, col)
+        array(i) -= value
+      }
+
+      array shouldBe Array.fill(12)(0d)
     }
 
   }
