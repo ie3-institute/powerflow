@@ -1,7 +1,7 @@
 plugins {
   id 'java' // java support
   id 'scala' // scala support
-  id 'com.diffplug.spotless' version '8.5.1'//code format
+  id 'com.diffplug.spotless' version '8.6.0'//code format
   id "org.sonarqube" version "7.3.0.8198" // sonarqube
   id 'org.scoverage' version '8.1' // Code coverage plugin for scala
   id "com.github.maiflai.scalatest" version "0.33" // run scalatest without specific spec task
@@ -66,7 +66,7 @@ dependencies {
 
   // logging //
   implementation "com.typesafe.scala-logging:scala-logging_${scalaVersion}:3.9.6" // pekko scala logging
-  implementation "ch.qos.logback:logback-classic:1.5.32"
+  implementation "ch.qos.logback:logback-classic:1.5.33"
 
   implementation "org.scalanlp:breeze_${scalaVersion}:2.1.0" // Scientific calculations
 }
