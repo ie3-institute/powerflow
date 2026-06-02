@@ -183,11 +183,14 @@ object DenseMatrix {
         matrix.cols,
         1.0,
         matrix.data,
+        0,
         matrix.rows,
         vec.toArray,
+        0,
         1,
         0.0,
         y.toArray,
+        0,
         1,
       )
 
