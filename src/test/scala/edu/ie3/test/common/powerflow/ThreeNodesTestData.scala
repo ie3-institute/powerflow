@@ -42,10 +42,10 @@ trait ThreeNodesTestData {
   )
 
   protected val expectedJacobianMatrix: DenseMatrix[Double] = DenseMatrix(
-    Seq(1120.53475, 0.0, 1375.48984, 0.0),
-    Seq(0.0, 224.09917, 0.0, 275.09797),
-    Seq(-1375.48984, 0.0, 1120.53475, 0.0),
-    Seq(0.0, -275.09797, 0.0, 224.09917),
+    Seq(1120.53635, 0.0, 1375.48984, 0.0),
+    Seq(0.0, 224.10727, 0.0, 275.09797),
+    Seq(-1375.48984, 0.0, 1120.53315, 0.0),
+    Seq(0.0, -275.09797, 0.0, 224.09106999999997),
   )
 
   protected val nodeCount: Int = admittanceMatrix.rows

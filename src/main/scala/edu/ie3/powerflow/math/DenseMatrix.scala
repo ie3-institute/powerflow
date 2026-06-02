@@ -100,7 +100,7 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
     new DenseMatrix(rows, cols, data.map(f), majorStride, isTransposed)
 
   def foreach[U](f: ((Int, Int), V) => U): Unit =
-    data.zipWithIndex.iterator.map { case (value, idx) =>
+    data.zipWithIndex.foreach { case (value, idx) =>
       f(rowAndColumnFromLinearIndex(idx), value)
     }
 
@@ -148,15 +148,15 @@ object DenseMatrix {
       val cols = matrix.cols
       val rows = matrix.rows
 
-      val real = filled(cols, rows, 0d, matrix.isTransposed)
-      val imag = filled(cols, rows, 0d, matrix.isTransposed)
+      val realPart = filled(cols, rows, 0d, matrix.isTransposed)
+      val imagPart = filled(cols, rows, 0d, matrix.isTransposed)
 
-      matrix.foreach { case ((col, row), value) =>
-        real(row, col) = value.real
-        imag(row, col) = value.imag
+      matrix.foreach { case ((row, col), value) =>
+        realPart(row, col) = value.real
+        imagPart(row, col) = value.imag
       }
 
-      (real, imag)
+      (realPart, imagPart)
     }
 
   given SUB_DMDM

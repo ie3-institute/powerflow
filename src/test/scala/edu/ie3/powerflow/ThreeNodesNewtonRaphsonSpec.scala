@@ -6,7 +6,7 @@
 
 package edu.ie3.powerflow
 
-import edu.ie3.powerflow.math.{DenseVector, Complex}
+import edu.ie3.powerflow.math.DenseVector
 import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
