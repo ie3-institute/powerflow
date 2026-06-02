@@ -38,6 +38,8 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
     val isTransposed: Boolean = false,
 ) extends NumericOperations[DenseMatrix[V]] {
 
+  def linearSize: Int = rows * cols
+
   def apply(row: Int, col: Int): V = data(linearIndex(row, col))
 
   def update(row: Int, col: Int, value: V): Unit = {
@@ -85,10 +87,10 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
   def rowIterator: Iterator[DenseVector[V]] = if isTransposed then {
     data.grouped(cols).map(DenseVector.apply)
   } else {
-    Iterator.range(0, rows).map { row =>
-      val vec = new DenseVector(cols, Array.ofDim(cols))
+    Iterator.range(0, cols).map { row =>
+      val vec = new DenseVector(rows, Array.ofDim(rows))
 
-      for col <- 0 until cols do {
+      for col <- 0 until rows do {
         vec(col) = valueAt(row, col)
       }
 

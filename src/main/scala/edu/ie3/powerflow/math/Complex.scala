@@ -19,11 +19,11 @@ case class Complex(real: Double, imag: Double) {
 
   def +(that: Complex) = Complex(real + that.real, imag + that.imag)
 
-  def +(that: Int) = Complex(real - that, imag)
+  def +(that: Int) = Complex(real + that, imag)
 
-  def +(that: Float) = Complex(real - that, imag)
+  def +(that: Float) = Complex(real + that, imag)
 
-  def +(that: Double) = Complex(real - that, imag)
+  def +(that: Double) = Complex(real + that, imag)
 
   def -(that: Complex) = Complex(real - that.real, imag - that.imag)
 
@@ -58,17 +58,6 @@ case class Complex(real: Double, imag: Double) {
   def /(that: Float) = Complex(real / that, imag / that)
 
   def /(that: Double) = Complex(real / that, imag / that)
-
-  def %(that: Complex): Complex = {
-    val div = this / that
-    this - (Complex(floor(div.real), floor(div.imag)) * div)
-  }
-
-  def %(that: Int): Complex = %(Complex(that, 0))
-
-  def %(that: Float): Complex = %(Complex(that, 0))
-
-  def %(that: Double): Complex = %(Complex(that, 0))
 
   def unary_- =
     Complex(-real, -imag)
@@ -132,7 +121,7 @@ object Complex {
 
     def +(that: Complex) = Complex(num + that.real, that.imag)
 
-    def -(that: Complex) = Complex(num - that.real, that.imag)
+    def -(that: Complex) = Complex(num - that.real, -that.imag)
 
     def *(that: Complex): Complex = that * num
 
@@ -144,7 +133,7 @@ object Complex {
 
     def +(that: Complex) = Complex(num + that.real, that.imag)
 
-    def -(that: Complex) = Complex(num - that.real, that.imag)
+    def -(that: Complex) = Complex(num - that.real, -that.imag)
 
     def *(that: Complex): Complex = that * num
 
@@ -156,7 +145,7 @@ object Complex {
 
     def +(that: Complex) = Complex(num + that.real, that.imag)
 
-    def -(that: Complex) = Complex(num - that.real, that.imag)
+    def -(that: Complex) = Complex(num - that.real, -that.imag)
 
     def *(that: Complex): Complex = that * num
 
