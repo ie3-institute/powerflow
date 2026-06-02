@@ -179,18 +179,15 @@ object DenseMatrix {
 
       blas.dgemv(
         trans,
-        matrix.rows,
-        matrix.cols,
+        if matrix.isTransposed then matrix.cols else matrix.rows,
+        if matrix.isTransposed then matrix.rows else matrix.cols,
         1.0,
         matrix.data,
-        0,
-        matrix.rows,
-        vec.toArray,
-        0,
+        matrix.majorStride,
+        vec.data,
         1,
         0.0,
-        y.toArray,
-        0,
+        y.data,
         1,
       )
 

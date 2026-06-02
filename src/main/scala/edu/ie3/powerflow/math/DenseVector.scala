@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
 
 class DenseVector[@specialized(Double) V: ClassTag](
     val length: Int,
-    private val data: Array[V],
+    val data: Array[V],
 ) extends NumericOperations[DenseVector[V]] {
 
   def apply(index: Int): V = {
