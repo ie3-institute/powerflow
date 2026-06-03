@@ -25,7 +25,7 @@ class DenseVectorSpec extends UnitSpec {
     "use map correctly" in {
       val vec = filled(4, 0d)
       val updatedVec = vec.map(_ + Complex.i)
-      updatedVec.forall(_ == Complex(0, 1))
+      updatedVec.forall(_ == Complex(0, 1)) shouldBe true
     }
 
     "use foreach correctly" in {

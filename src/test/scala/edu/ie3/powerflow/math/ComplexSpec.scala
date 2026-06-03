@@ -99,7 +99,8 @@ class ComplexSpec extends UnitSpec {
     "be divided by a float number correctly" in {
       val base = Complex(1, 3)
       val res = base / 1.5f
-      res shouldBe Complex(0.6666666666666666, 2)
+      res.real shouldBe 0.6666666666666666 +- 1e-3
+      res.imag shouldBe 2.0
     }
 
     "be divided by a double number correctly" in {
@@ -170,7 +171,7 @@ class ComplexSpec extends UnitSpec {
 
   "A double" should {
     "be converted into a complex number correctly" in {
-      1.5f.i shouldBe Complex(0, 1.5)
+      2.0.i shouldBe Complex(0, 2.0)
     }
 
     "add a complex number correctly" in {

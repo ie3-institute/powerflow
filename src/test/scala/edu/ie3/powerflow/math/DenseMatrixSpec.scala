@@ -199,7 +199,7 @@ class DenseMatrixSpec extends UnitSpec {
     "use map correctly" in {
       val matrix = filled(3, 4, 0d)
       val updatedMatrix = matrix.map(_ + Complex.i)
-      updatedMatrix.forall(_ == Complex(0, 1))
+      updatedMatrix.forall(_ == Complex(0, 1)) shouldBe true
     }
 
     "use foreach correctly" in {
