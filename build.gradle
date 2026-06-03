@@ -45,6 +45,13 @@ repositories {
 
 dependencies {
 
+  // Blas and Lapack //
+  implementation "dev.ludovic.netlib:blas:3.0.1"
+  implementation "dev.ludovic.netlib:lapack:3.0.1"
+  implementation "dev.ludovic.netlib:arpack:3.0.1"
+  implementation "net.sourceforge.f2j:arpack_combined_all:0.1"
+
+
   // CORE Scala //
   implementation "org.scala-lang:scala3-library_3:${scalaBinaryVersion}"
 

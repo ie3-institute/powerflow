@@ -6,11 +6,12 @@
 
 package edu.ie3.powerflow
 
-import breeze.linalg.DenseMatrix
-import breeze.numerics.abs
+import edu.ie3.powerflow.math.DenseMatrix
 import edu.ie3.powerflow.model.JacobianMatrix
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.ThreeNodesTestData
+
+import scala.math.abs
 
 class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
   val testTolerance = 1e-3

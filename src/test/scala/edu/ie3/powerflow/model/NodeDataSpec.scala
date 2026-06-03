@@ -6,8 +6,7 @@
 
 package edu.ie3.powerflow.model
 
-import breeze.linalg.DenseVector
-import breeze.math.Complex
+import edu.ie3.powerflow.math.{DenseVector, Complex}
 import edu.ie3.powerflow.model.NodeData.{PresetData, StateData}
 import edu.ie3.powerflow.model.enums.NodeType
 import edu.ie3.powerflow.util.exceptions.PowerFlowException
@@ -73,7 +72,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
       )
       val actual = PresetData.extractPowerVector(operationPoint)
 
-      actual should be(expected)
+      actual.toArray shouldBe expected.toArray
     }
   }
 
@@ -89,7 +88,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
       )
       val actual = StateData.extractVoltageVector(lastState)
 
-      actual should be(expected)
+      actual.toArray shouldBe expected.toArray
     }
 
     "extract a power vector correctly" in {
@@ -103,7 +102,7 @@ class NodeDataSpec extends UnitSpec with SixNodesTestData {
       )
       val actual = StateData.extractPowerVector(lastState)
 
-      actual should be(expected)
+      actual.toArray shouldBe expected.toArray
     }
   }
 }
