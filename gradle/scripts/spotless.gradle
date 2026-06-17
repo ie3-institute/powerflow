@@ -2,10 +2,10 @@
 
 spotless {
   def ie3LicHead = '/*\n' +
-      ' * © $YEAR. TU Dortmund University,\n' +
-      ' * Institute of Energy Systems, Energy Efficiency and Energy Economics,\n' +
-      ' * Research group Distribution grid planning and operation\n' +
-      ' */\n\n'
+  ' * © $YEAR. TU Dortmund University,\n' +
+  ' * Institute of Energy Systems, Energy Efficiency and Energy Economics,\n' +
+  ' * Research group Distribution grid planning and operation\n' +
+  ' */\n\n'
 
   groovyGradle {
     // same as groovy, but for .gradle (defaults to '*.gradle')
