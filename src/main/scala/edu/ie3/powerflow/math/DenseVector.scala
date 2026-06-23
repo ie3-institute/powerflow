@@ -97,7 +97,7 @@ object DenseVector {
       tmp
     }
 
-  given MUL_DVDV_EW: MulElementWise[DenseVector[Complex], DenseVector[
+  given MUL_CVCV_EW: MulElementWise[DenseVector[Complex], DenseVector[
     Complex
   ], DenseVector[Complex]] = (vec1, vec2) => {
     val y = DenseVector.filled(vec1.length, Complex.zero)

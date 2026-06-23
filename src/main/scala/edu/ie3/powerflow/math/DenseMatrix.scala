@@ -6,10 +6,9 @@
 
 package edu.ie3.powerflow.math
 
-import dev.ludovic.netlib.blas.BLAS
-import dev.ludovic.netlib.lapack.LAPACK
+import edu.ie3.powerflow.libraries.blas.Blas
+import edu.ie3.powerflow.libraries.lapack.Lapack
 import edu.ie3.powerflow.math.NumericOperations.{Mul, Solve, Split, Sub}
-import org.netlib.util.intW
 
 import scala.reflect.ClassTag
 
@@ -111,8 +110,8 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
 }
 
 object DenseMatrix {
-  private lazy val blas = BLAS.getInstance()
-  private lazy val lapack = LAPACK.getInstance()
+  lazy val lapack: Lapack = Lapack.lib
+  lazy val blas: Blas = Blas.lib
 
   def filled[V: ClassTag](
       rows: Int,
@@ -176,11 +175,8 @@ object DenseMatrix {
   given MUL_RMRV
       : Mul[DenseMatrix[Double], DenseVector[Double], DenseVector[Double]] =
     (matrix, vec) => {
-      val trans = if matrix.isTransposed then "T" else "N"
-      val y = DenseVector.filled(vec.length, 0d)
-
-      blas.dgemv(
-        trans,
+      val y = blas.dgemv(
+        if matrix.isTransposed then "T" else "N",
         if matrix.isTransposed then matrix.cols else matrix.rows,
         if matrix.isTransposed then matrix.rows else matrix.cols,
         1.0,
@@ -189,11 +185,11 @@ object DenseMatrix {
         vec.data,
         1,
         0.0,
-        y.data,
+        Array.fill(vec.length)(0),
         1,
       )
 
-      y
+      DenseVector(y)
     }
 
   given MUL_CMCV
@@ -211,17 +207,16 @@ object DenseMatrix {
     (matrix, vec) => {
       val n = matrix.cols
       val ipiv = Array.fill(n)(0)
-      val b = vec.toArray
 
-      lapack.dgesv(
+      val b = lapack.dgesv(
         n,
         1,
         matrix.data,
         n,
         ipiv,
-        b,
+        vec.toArray,
         n,
-        new intW(0),
+        0,
       )
 
       DenseVector(b)
