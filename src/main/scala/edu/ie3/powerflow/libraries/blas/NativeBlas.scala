@@ -8,6 +8,7 @@ package edu.ie3.powerflow.libraries.blas
 
 import edu.ie3.powerflow.libraries.Native
 
+import java.lang.foreign.Arena
 import java.lang.foreign.FunctionDescriptor.ofVoid
 import java.lang.foreign.ValueLayout.*
 
@@ -46,25 +47,29 @@ final case class NativeBlas(
       y: Array[Double],
       incy: Int,
   ): Array[Double] = {
-    // allocate memory and set values
-    val yPtr = y.toStack
+    // using == try-with-resource
+    withArena { arena =>
+      given Arena = arena
 
-    dgemvHandle.invoke(
-      trans.asPtr,
-      m.asPtr,
-      n.asPtr,
-      alpha.asPtr,
-      a.toStack,
-      lda.asPtr,
-      x.toStack,
-      incx.asPtr,
-      beta.asPtr,
-      yPtr,
-      incy.asPtr,
-    )
+      // allocate memory and set values
+      val yPtr = y.toStack
 
-    yPtr.toArray(JAVA_DOUBLE)
+      dgemvHandle.invoke(
+        trans.asPtr,
+        m.asPtr,
+        n.asPtr,
+        alpha.asPtr,
+        a.toStack,
+        lda.asPtr,
+        x.toStack,
+        incx.asPtr,
+        beta.asPtr,
+        yPtr,
+        incy.asPtr,
+      )
 
+      yPtr.toArray(JAVA_DOUBLE)
+    }
   }
 
 }

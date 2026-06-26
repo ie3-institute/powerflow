@@ -8,6 +8,7 @@ package edu.ie3.powerflow.libraries.lapack
 
 import edu.ie3.powerflow.libraries.Native
 
+import java.lang.foreign.Arena
 import java.lang.foreign.FunctionDescriptor.ofVoid
 import java.lang.foreign.ValueLayout.*
 
@@ -40,22 +41,27 @@ final case class NativeLapack(
       ldb: Int,
       info: Int,
   ): Array[Double] = {
-    // allocate memory and set values
-    val bInMemory = b.toStack
+    // using == try-with-resource
+    withArena { arena =>
+      given Arena = arena
 
-    // call lapack function
-    dgesvHandle.invoke(
-      n.asPtr,
-      nrhs.asPtr,
-      a.toStack,
-      lda.asPtr,
-      ipiv.toStack,
-      bInMemory,
-      ldb.asPtr,
-      info.asPtr,
-    )
+      // allocate memory and set values
+      val bPtr = b.toStack
 
-    bInMemory.toArray(JAVA_DOUBLE)
+      // call lapack function
+      dgesvHandle.invoke(
+        n.asPtr,
+        nrhs.asPtr,
+        a.toStack,
+        lda.asPtr,
+        ipiv.toStack,
+        bPtr,
+        ldb.asPtr,
+        info.asPtr,
+      )
+
+      bPtr.toArray(JAVA_DOUBLE)
+    }
   }
 
 }

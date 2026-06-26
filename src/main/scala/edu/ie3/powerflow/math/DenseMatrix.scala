@@ -107,6 +107,8 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
 
+  def exist(p: V => Boolean): Boolean = data.exists(p)
+
 }
 
 object DenseMatrix {

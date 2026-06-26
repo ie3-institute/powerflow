@@ -35,20 +35,19 @@ object LibraryLoader {
       default: T,
   ): T =
     libPath match {
-      case Some(path) =>
+      case Some(path) if path != null && path.nonEmpty =>
         try {
           native(path)
         } catch {
           case e: Throwable =>
             log.warn(
               s"Could not load native library '$path'. Using fallback implementation",
-              e,
             )
 
             load(fallback, native, default)
         }
 
-      case None =>
+      case _ =>
         load(fallback, native, default)
     }
 

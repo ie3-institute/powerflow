@@ -9,18 +9,19 @@ package edu.ie3.powerflow.libraries
 import java.lang.foreign.*
 import java.lang.foreign.ValueLayout.{JAVA_DOUBLE, JAVA_INT, JAVA_LONG}
 import java.lang.invoke.MethodHandle
+import scala.util.{Try, Using}
 
 /** Trait that contains some methods and extensions to simplify the process of
   * writing wrappers.
   */
 trait Native {
 
-  protected given arena: Arena = Arena.ofAuto()
+  private val arena: Arena = Arena.global()
   private val linker: Linker = Linker.nativeLinker()
 
   val libName: String
 
-  private val library: SymbolLookup = SymbolLookup.libraryLookup(libName, arena)
+  val library: SymbolLookup = SymbolLookup.libraryLookup(libName, arena)
 
   def buildHandle(
       fcnName: String,
@@ -29,6 +30,8 @@ trait Native {
     val ptr = library.findOrThrow(fcnName)
     linker.downcallHandle(ptr, descriptor)
   }
+
+  def withArena[R](f: Arena => R): R = Using(Arena.ofConfined())(f).get
 
   // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
   // some extensions
