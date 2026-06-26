@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Provide error message when fail calculating the correction [#24](https://github.com/ie3-institute/powerflow/issues/24)
 - Improved calculation of jacobian matrix [#298](https://github.com/ie3-institute/powerflow/issues/298)
 - Replacing `breeze` with own implementation [#300](https://github.com/ie3-institute/powerflow/issues/300)
+- Switch loading of `BLAS` and `LAPACK` to java FFM API [#309](https://github.com/ie3-institute/powerflow/issues/309)
 
 ## [0.4]
 
