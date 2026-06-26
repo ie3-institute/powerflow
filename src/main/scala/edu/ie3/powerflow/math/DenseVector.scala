@@ -46,6 +46,8 @@ class DenseVector[@specialized(Double) V: ClassTag](
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
 
+  def exists(p: V => Boolean): Boolean = data.exists(p)
+
 }
 
 object DenseVector {
