@@ -6,16 +6,11 @@
 
 package edu.ie3.powerflow.math
 
-import edu.ie3.powerflow.math.NumericOperations.{
-  Mul,
-  MulElementWise,
-  Split,
-  Sub,
-}
+import edu.ie3.powerflow.math.NumericOperations.*
 
 import scala.reflect.ClassTag
 
-class DenseVector[@specialized(Double) V: ClassTag](
+class DenseVector[@specialized(Double, Int) V: ClassTag](
     val length: Int,
     val data: Array[V],
 ) extends NumericOperations[DenseVector[V]] {
@@ -40,8 +35,8 @@ class DenseVector[@specialized(Double) V: ClassTag](
     new DenseVector(length, data.map(f))
 
   def foreach[U](f: (Int, V) => U): Unit =
-    data.zipWithIndex.foreach { case (value, idx) =>
-      f(idx, value)
+    for idx <- data.indices do {
+      f(idx, data(idx))
     }
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
@@ -79,6 +74,22 @@ object DenseVector {
       }
 
       (real, imag)
+    }
+
+  given TRANSFORM_CM: Transform[DenseVector[Complex], DenseMatrix[Double]] =
+    vec => {
+      val lenSingle = vec.length
+      val len = lenSingle * 2
+      val array: Array[Double] = Array.ofDim[Double](len)
+
+      var idx = 0
+      vec.data.foreach { c =>
+        array(idx) = c.real
+        array(idx + lenSingle) = c.imag
+        idx += 1
+      }
+
+      DenseMatrix(lenSingle, 2, array, lenSingle)
     }
 
   given SUB_CVCV

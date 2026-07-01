@@ -169,13 +169,8 @@ object NodeData extends LazyLogging {
       * @return
       *   Vector of complex nodal powers
       */
-    def extractVoltageVector(state: Array[StateData]): DenseVector[Complex] = {
-      DenseVector(
-        state.foldLeft(Array.empty[Complex])((array, data) =>
-          array :+ data.voltage
-        )
-      )
-    }
+    def extractVoltageVector(state: Array[StateData]): DenseVector[Complex] =
+      DenseVector(state.map(_.voltage))
 
     /** Extract a [[DenseVector]] of nodal powers from an Array of [[StateData]]
       *
@@ -184,12 +179,8 @@ object NodeData extends LazyLogging {
       * @return
       *   Vector of complex nodal voltages
       */
-    def extractPowerVector(state: Array[StateData]): DenseVector[Complex] = {
-      DenseVector(
-        state
-          .foldLeft(Array.empty[Complex])((array, data) => array :+ data.power)
-      )
-    }
+    def extractPowerVector(state: Array[StateData]): DenseVector[Complex] =
+      DenseVector(state.map(_.power))
   }
 
   /** Representing the deviation between an [[PresetData]] and the information
