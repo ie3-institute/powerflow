@@ -56,8 +56,6 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
     data(linearIndex(row, col)) = value
   }
 
-  def valueAt(row: Int, column: Int): V = data(linearIndex(row, column))
-
   def linearIndex(row: Int, column: Int): Int = {
     if isTransposed then {
       row * majorStride + column
@@ -96,7 +94,7 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
       val vec: Array[V] = Array.ofDim[V](rows)
 
       for row <- 0 until rows do {
-        vec(row) = valueAt(row, col)
+        vec(row) = apply(row, col)
       }
 
       vec
@@ -191,10 +189,14 @@ object DenseMatrix {
       val real = Array.ofDim[Double](len)
       val imag = Array.ofDim[Double](len)
 
-      for idx <- data.indices do {
+      var idx = 0
+
+      while idx < len do {
         val c: Complex = data(idx)
         real(idx) = c.real
         imag(idx) = c.imag
+
+        idx += 1
       }
 
       (
@@ -237,11 +239,11 @@ object DenseMatrix {
         matrix.data,
         0,
         matrix.majorStride,
-        vec.data,
+        vec.asArray,
         0,
         1,
         0.0,
-        y.data,
+        y.asArray,
         0,
         1,
       )
@@ -285,22 +287,31 @@ object DenseMatrix {
       val realArray: Array[Double] = Array.fill[Double](vec.length)(0d)
       val imagArray: Array[Double] = Array.fill[Double](vec.length)(0d)
 
-      val vecData: Array[Complex] = vec.data
+      val vecData: Array[Complex] = vec.asArray
       val matrixData: Array[Complex] = matrix.data
 
-      for idx <- matrixData.indices do {
+      val len = matrixData.length
+
+      var idx = 0
+      while idx < len do {
         val (r, c) = matrix.rowAndColumn(idx)
         val mValue = matrixData(idx)
         val vValue = vecData(c)
 
         realArray(r) += mValue.real * vValue.real - mValue.imag * vValue.imag
         imagArray(r) += mValue.real * vValue.imag + mValue.imag * vValue.real
+
+        idx += 1
       }
 
       val array: Array[Complex] = Array.ofDim[Complex](vec.length)
 
-      for idx <- realArray.indices do {
-        array(idx) = Complex(realArray(idx), imagArray(idx))
+      val lenArr = realArray.length
+      var n = 0
+      while n < lenArr do {
+        array(n) = Complex(realArray(n), imagArray(n))
+
+        n += 1
       }
 
       DenseVector(array)
@@ -311,7 +322,7 @@ object DenseMatrix {
     (matrix, vec) => {
       val n = matrix.cols
       val ipiv = Array.fill(n)(0)
-      val b = vec.toArray
+      val b = vec.asArray
 
       lapack.dgesv(
         n,

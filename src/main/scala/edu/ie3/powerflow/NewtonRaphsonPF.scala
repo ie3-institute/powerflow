@@ -294,7 +294,7 @@ case object NewtonRaphsonPF extends LazyLogging {
 
     val nodalPower = v *:* (admittanceMatrix * v).map(_.conjugate)
     state
-      .zip(nodalPower.toArray)
+      .zip(nodalPower.asArray)
       .map(stateAndPowerPair =>
         stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
       )
@@ -323,7 +323,7 @@ case object NewtonRaphsonPF extends LazyLogging {
     else {
       val intermediateOperationPoint =
         operationPoint
-          .zip(iterationPower.toArray)
+          .zip(iterationPower.asArray)
           .map { nodeDataWithPower =>
             val nodeData = nodeDataWithPower._1
             val power = nodeDataWithPower._2
@@ -501,8 +501,8 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
-          deltaE.toArray
-            .zip(deltaF.toArray)
+          deltaE.asArray
+            .zip(deltaF.asArray)
             .map(complexPair => Complex(complexPair._1, complexPair._2))
 
         val indicesOfPVPQnodes =

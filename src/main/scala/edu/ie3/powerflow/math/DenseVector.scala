@@ -10,9 +10,9 @@ import edu.ie3.powerflow.math.NumericOperations.*
 
 import scala.reflect.ClassTag
 
-class DenseVector[@specialized(Double, Int) V: ClassTag](
-    val length: Int,
-    val data: Array[V],
+final case class DenseVector[@specialized(Double, Int) V: ClassTag](
+    length: Int,
+    private[math] val data: Array[V],
 ) extends NumericOperations[DenseVector[V]] {
 
   def apply(index: Int): V = {
@@ -28,6 +28,8 @@ class DenseVector[@specialized(Double, Int) V: ClassTag](
   def slice(from: Int, until: Int): DenseVector[V] = DenseVector(
     data.slice(from, until)
   )
+
+  private[powerflow] def asArray: Array[V] = data
 
   def toArray: Array[V] = Array.from(data)
 
@@ -81,9 +83,11 @@ object DenseVector {
       val lenSingle = vec.length
       val len = lenSingle * 2
       val array: Array[Double] = Array.ofDim[Double](len)
+      val data = vec.data
 
       var idx = 0
-      vec.data.foreach { c =>
+      while idx < lenSingle do {
+        val c: Complex = data(idx)
         array(idx) = c.real
         array(idx + lenSingle) = c.imag
         idx += 1
