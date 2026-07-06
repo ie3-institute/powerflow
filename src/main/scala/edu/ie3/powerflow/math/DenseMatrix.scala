@@ -21,11 +21,10 @@ import scala.reflect.ClassTag
 
 /** A dense matrix with column major memory layout if [[isTransposed]] is false,
   * else with row major memory layout.
-  *
-  * @param cols
-  *   The number of matrix columns.
   * @param rows
   *   The number of matrix rows.
+  * @param cols
+  *   The number of matrix columns.
   * @param data
   *   The actual data of the matrix
   * @param majorStride
@@ -132,6 +131,8 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
 
   def exists(p: V => Boolean): Boolean = data.exists(p)
 
+  def isSparse: Boolean = data.count(_ != 0d) < 0.4 * linearSize
+
 }
 
 object DenseMatrix {
@@ -177,6 +178,46 @@ object DenseMatrix {
 
     matrix
   }
+
+  given TRANSFORM_SPARSE_DOUBLE: Transform[DenseMatrix[Double], CSCMatrix] =
+    matrix => {
+      val nonZeroEl = matrix.data.count(_ != 0d)
+
+      val columnOffset: Array[Int] = Array.ofDim[Int](matrix.cols + 1)
+      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroEl)
+      val data: Array[Double] = Array.ofDim[Double](nonZeroEl)
+
+      var colIdx = 0
+      var dataIdx = 0
+      var count = 0
+
+      for col <- matrix.colIteratorInternal do {
+        columnOffset(colIdx) = count
+        colIdx += 1
+
+        for idx <- col.indices do {
+          val element: Double = col(idx)
+
+          if element != 0 then {
+            rowIndices(dataIdx) = idx
+            data(dataIdx) = element
+
+            dataIdx += 1
+            count += 1
+          }
+        }
+      }
+
+      columnOffset(colIdx) = count
+
+      CSCMatrix(
+        matrix.rows,
+        matrix.cols,
+        columnOffset,
+        rowIndices,
+        data,
+      )
+    }
 
   given SPLIT_CM
       : Split[DenseMatrix[Complex], DenseMatrix[Double], DenseMatrix[Double]] =

@@ -6,8 +6,10 @@
 
 package edu.ie3.powerflow
 
+import edu.ie3.powerflow.libraries.UMFPACK
 import edu.ie3.powerflow.math.DenseVector
 import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
+import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.{IndexMapping, PowerFlowResult}
@@ -106,6 +108,7 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
         lastState,
         expectedDeviationVector,
         expectedJacobianMatrix,
+        UMFPACK.get,
       )
 
       actualOpt.isDefined should be(true)
