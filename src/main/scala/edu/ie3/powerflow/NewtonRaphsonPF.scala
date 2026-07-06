@@ -49,7 +49,7 @@ final case class NewtonRaphsonPF(
     epsilon: Double,
     maxIterations: Integer,
     admittanceMatrix: DenseMatrix[Complex],
-    sparseSolver: Option[SparseSolver] = UMFPACK.get,
+    sparseSolver: Option[SparseSolver] = None,
 ) extends LazyLogging {
   if admittanceMatrix.rows != admittanceMatrix.cols then
     throw new PowerFlowException("Have a square matrix ready!")
@@ -465,10 +465,16 @@ case object NewtonRaphsonPF extends LazyLogging {
     val nodeCount = lastState.length
 
     val correction: Try[DenseVector[Double]] = Try {
-
       sparseSolver match {
-        case Some(solver) if jacobianMatrix.isSparse =>
-          solver.solve(jacobianMatrix.transform, deviation)
+        case Some(solver) =>
+          val nonZeroElCount = jacobianMatrix.countNonZeroElements
+
+          if jacobianMatrix.isSparse(nonZeroElCount) then {
+            solver.solve(jacobianMatrix.toSparse(nonZeroElCount), deviation)
+          } else {
+            jacobianMatrix \ deviation
+          }
+
         case _ =>
           jacobianMatrix \ deviation
       }

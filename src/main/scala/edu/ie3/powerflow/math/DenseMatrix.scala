@@ -121,8 +121,6 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
 
   def exists(p: V => Boolean): Boolean = data.exists(p)
 
-  def isSparse: Boolean = data.count(_ != 0d) < 0.4 * linearSize
-
 }
 
 object DenseMatrix {
@@ -159,45 +157,80 @@ object DenseMatrix {
     matrix
   }
 
-  given TRANSFORM_SPARSE_DOUBLE: Transform[DenseMatrix[Double], CSCMatrix] =
-    matrix => {
-      val nonZeroEl = matrix.data.count(_ != 0d)
+  extension (matrix: DenseMatrix[Double]) {
+
+    def countNonZeroElements: Int = {
+      var nonZeroEl: Int = 0
+      val data: Array[Double] = matrix.data
+      val length = data.length
+      var idx: Int = 0
+
+      while idx < length do {
+        val el: Double = data(idx)
+
+        if el != 0d then {
+          nonZeroEl += 1
+        }
+
+        idx += 1
+      }
+
+      nonZeroEl
+    }
+
+    def isSparse(nonZeroElementCount: Int): Boolean =
+      nonZeroElementCount < matrix.linearSize / 10 * 4
+
+    def toSparse(nonZeroElementCount: Int): CSCMatrix = {
+      val rows: Int = matrix.rows
+      val cols: Int = matrix.cols
+      val data: Array[Double] = matrix.data
+      val length = data.length
+      var idx: Int = 0
 
       val columnOffset: Array[Int] = Array.ofDim[Int](matrix.cols + 1)
-      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroEl)
-      val data: Array[Double] = Array.ofDim[Double](nonZeroEl)
+      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroElementCount)
+      val values: Array[Double] = Array.ofDim[Double](nonZeroElementCount)
 
       var colIdx = 0
       var dataIdx = 0
       var count = 0
+      var col = 0
 
-      for col <- matrix.colIteratorInternal do {
+      while colIdx < cols do {
         columnOffset(colIdx) = count
-        colIdx += 1
 
-        for idx <- col.indices do {
-          val element: Double = col(idx)
+        var rowIdx = 0
+        val offset = colIdx * rows
 
-          if element != 0 then {
-            rowIndices(dataIdx) = idx
-            data(dataIdx) = element
+        while rowIdx < rows do {
+          val element: Double = data(offset + rowIdx)
+
+          if element != 0.0 then {
+            rowIndices(dataIdx) = rowIdx
+            values(dataIdx) = element
 
             dataIdx += 1
             count += 1
           }
+
+          rowIdx += 1
         }
+
+        colIdx += 1
       }
 
       columnOffset(colIdx) = count
 
       CSCMatrix(
-        matrix.rows,
-        matrix.cols,
+        rows,
+        cols,
         columnOffset,
         rowIndices,
-        data,
+        values,
       )
     }
+  }
 
   given SPLIT_CM
       : Split[DenseMatrix[Complex], DenseMatrix[Double], DenseMatrix[Double]] =
