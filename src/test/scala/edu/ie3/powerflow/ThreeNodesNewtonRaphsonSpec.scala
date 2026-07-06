@@ -6,6 +6,7 @@
 
 package edu.ie3.powerflow
 
+import edu.ie3.powerflow.libraries.UMFPACK
 import edu.ie3.powerflow.math.DenseVector
 import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult
@@ -101,6 +102,7 @@ class ThreeNodesNewtonRaphsonSpec extends UnitSpec with ThreeNodesTestData {
         lastState,
         expectedDeviationVector,
         expectedJacobianMatrix,
+        UMFPACK.get,
       )
 
       actualOpt.isDefined should be(true)
