@@ -6,15 +6,8 @@
 
 package edu.ie3.powerflow.math
 
-import dev.ludovic.netlib.blas.BLAS
-import dev.ludovic.netlib.lapack.LAPACK
-import edu.ie3.powerflow.math.NumericOperations.{
-  Mul,
-  Solve,
-  Split,
-  Sub,
-  Transform,
-}
+import edu.ie3.powerflow.libraries.GlobalLibraries.{blas, lapack}
+import edu.ie3.powerflow.math.NumericOperations.*
 import org.netlib.util.intW
 
 import scala.reflect.ClassTag
@@ -129,13 +122,9 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
 
   def exists(p: V => Boolean): Boolean = data.exists(p)
 
-  def isSparse: Boolean = data.count(_ != 0d) < 0.4 * linearSize
-
 }
 
 object DenseMatrix {
-  private lazy val blas = BLAS.getInstance()
-  private lazy val lapack = LAPACK.getInstance()
 
   def empty[V: ClassTag](
       rows: Int,
@@ -177,45 +166,79 @@ object DenseMatrix {
     matrix
   }
 
-  given TRANSFORM_SPARSE_DOUBLE: Transform[DenseMatrix[Double], CSCMatrix] =
-    matrix => {
-      val nonZeroEl = matrix.data.count(_ != 0d)
+  extension (matrix: DenseMatrix[Double]) {
+
+    def countNonZeroElements: Int = {
+      var nonZeroEl: Int = 0
+      val data: Array[Double] = matrix.data
+      val length = data.length
+      var idx: Int = 0
+
+      while idx < length do {
+        val el: Double = data(idx)
+
+        if el != 0d then {
+          nonZeroEl += 1
+        }
+
+        idx += 1
+      }
+
+      nonZeroEl
+    }
+
+    def isSparse(nonZeroElementCount: Int): Boolean = nonZeroElementCount < matrix.linearSize / 10 * 4
+
+    def toSparse(nonZeroElementCount: Int): CSCMatrix = {
+      val rows: Int = matrix.rows
+      val cols: Int = matrix.cols
+      val data: Array[Double] = matrix.data
+      val length = data.length
+      var idx: Int = 0
 
       val columnOffset: Array[Int] = Array.ofDim[Int](matrix.cols + 1)
-      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroEl)
-      val data: Array[Double] = Array.ofDim[Double](nonZeroEl)
+      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroElementCount)
+      val values: Array[Double] = Array.ofDim[Double](nonZeroElementCount)
 
       var colIdx = 0
       var dataIdx = 0
       var count = 0
+      var col = 0
 
-      for col <- matrix.colIteratorInternal do {
+      while colIdx < cols do {
         columnOffset(colIdx) = count
-        colIdx += 1
 
-        for idx <- col.indices do {
-          val element: Double = col(idx)
+        var rowIdx = 0
+        val offset = colIdx * rows
 
-          if element != 0 then {
-            rowIndices(dataIdx) = idx
-            data(dataIdx) = element
+        while rowIdx < rows do {
+          val element: Double = data(offset + rowIdx)
+
+          if element != 0.0 then {
+            rowIndices(dataIdx) = rowIdx
+            values(dataIdx) = element
 
             dataIdx += 1
             count += 1
           }
+
+          rowIdx += 1
         }
+
+        colIdx += 1
       }
 
       columnOffset(colIdx) = count
 
       CSCMatrix(
-        matrix.rows,
-        matrix.cols,
+        rows,
+        cols,
         columnOffset,
         rowIndices,
-        data,
+        values,
       )
     }
+  }
 
   given SPLIT_CM
       : Split[DenseMatrix[Complex], DenseMatrix[Double], DenseMatrix[Double]] =
@@ -280,11 +303,11 @@ object DenseMatrix {
         matrix.data,
         0,
         matrix.majorStride,
-        vec.asArray,
+        vec.data,
         0,
         1,
         0.0,
-        y.asArray,
+        y.data,
         0,
         1,
       )
@@ -325,10 +348,10 @@ object DenseMatrix {
   given MUL_CMCV
       : Mul[DenseMatrix[Complex], DenseVector[Complex], DenseVector[Complex]] =
     (matrix, vec) => {
-      val realArray: Array[Double] = Array.fill[Double](vec.length)(0d)
-      val imagArray: Array[Double] = Array.fill[Double](vec.length)(0d)
+      val realArray: Array[Double] = Array.ofDim[Double](vec.length)
+      val imagArray: Array[Double] = Array.ofDim[Double](vec.length)
 
-      val vecData: Array[Complex] = vec.asArray
+      val vecData: Array[Complex] = vec.data
       val matrixData: Array[Complex] = matrix.data
       val majorStride: Int = matrix.majorStride
 
@@ -358,15 +381,15 @@ object DenseMatrix {
         n += 1
       }
 
-      DenseVector(array)
+      DenseVector(lenArr, array)
     }
 
   given SOLVE_DMDV
       : Solve[DenseMatrix[Double], DenseVector[Double], DenseVector[Double]] =
     (matrix, vec) => {
       val n = matrix.cols
-      val ipiv = Array.fill(n)(0)
-      val b = vec.asArray
+      val ipiv: Array[Int] = Array.ofDim[Int](n)
+      val b: Array[Double] = vec.data
 
       lapack.dgesv(
         n,

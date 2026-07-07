@@ -6,8 +6,6 @@
 
 package edu.ie3.powerflow.math
 
-import java.lang.foreign.Arena
-import java.lang.foreign.ValueLayout.{ADDRESS, JAVA_DOUBLE}
 
 trait SparseSolver {
 
