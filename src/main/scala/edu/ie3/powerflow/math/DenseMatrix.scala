@@ -131,7 +131,7 @@ object DenseMatrix {
   ): DenseMatrix[V] = {
     val length = cols * rows
     val data = Array.ofDim[V](length)
-    new DenseMatrix(cols, rows, data, rows, isTransposed)
+    new DenseMatrix(rows, cols, data, cols, isTransposed)
   }
 
   def filled[V: ClassTag](
@@ -141,8 +141,15 @@ object DenseMatrix {
       isTransposed: Boolean = false,
   ): DenseMatrix[V] = {
     val length = cols * rows
-    val data: Array[V] = Array.fill[V](length)(value)
-    new DenseMatrix(cols, rows, data, rows, isTransposed)
+    val data: Array[V] = Array.ofDim[V](length)
+
+    var idx = 0
+    while idx < length do {
+      data(idx) = value
+      idx += 1
+    }
+
+    new DenseMatrix(rows, cols, data, cols, isTransposed)
   }
 
   def apply[R <: Seq[V], V: ClassTag](rows: R*): DenseMatrix[V] = {
@@ -245,13 +252,16 @@ object DenseMatrix {
       val transA = if matrixA.isTransposed then "T" else "N"
       val transB = if matrixB.isTransposed then "T" else "N"
 
-      val matrixC = DenseMatrix.filled(matrixB.rows, matrixB.cols, 0d)
+      val m = if matrixA.isTransposed then matrixA.cols else matrixA.rows
+      val n = if matrixB.isTransposed then matrixB.rows else matrixB.cols
+
+      val dataC: Array[Double] = Array.ofDim[Double](m * n)
 
       blas.dgemm(
         transA,
         transB,
-        if matrixA.isTransposed then matrixA.cols else matrixA.rows,
-        if matrixB.isTransposed then matrixB.rows else matrixB.cols,
+        m,
+        n,
         if matrixA.isTransposed then matrixA.rows else matrixA.cols,
         1.0,
         matrixA.data,
@@ -260,13 +270,13 @@ object DenseMatrix {
         matrixB.data,
         0,
         matrixB.majorStride,
-        1,
-        matrixC.data,
+        0.0,
+        dataC,
         0,
-        matrixC.majorStride,
+        m,
       )
 
-      matrixC
+      new DenseMatrix[Double](n, m, dataC, m)
     }
 
   given MUL_CMCV
