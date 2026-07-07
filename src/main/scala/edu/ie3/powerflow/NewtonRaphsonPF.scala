@@ -118,46 +118,55 @@ final case class NewtonRaphsonPF(
     val deviationVector =
       NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation, indexMapping)
     val converged = deviationVector.forall(_.abs < epsilon)
-    val jacobianMatrix =
-      JacobianMatrix.buildJacobianMatrix(
-        indexMapping,
-        lastStateWithIterationPower,
-        admittanceMatrix,
-      )
 
-    NewtonRaphsonPF.correctVoltages(
-      lastStateWithIterationPower,
-      deviationVector,
-      jacobianMatrix,
-      sparseSolver,
-    ) match {
-      case Some(correctedState) if converged =>
-        logger.debug(
-          s"Power flow calculation converged in iteration $iterationCount"
-        )
-        ValidNewtonRaphsonPFResult(
-          iterationCount,
-          correctedState,
-          jacobianMatrix,
-        )
-      case Some(correctedState)
-          if !converged && iterationCount < maxIterations =>
-        solveIterationStepsRecursively(
-          iterationCount + 1,
+
+    if converged then {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
           indexMapping,
-          operationPoint,
-          correctedState,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-      case Some(_) if !converged & iterationCount >= maxIterations =>
-        logger.debug(
-          s"Power flow finally did not converge after $iterationCount iterations"
+
+      ValidNewtonRaphsonPFResult(
+        iterationCount,
+        lastStateWithIterationPower,
+        jacobianMatrix,
+      )
+    } else if iterationCount >= maxIterations then {
+      logger.debug(
+        s"Power flow finally did not converge after $iterationCount iterations"
+      )
+      FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
+
+    } else {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
+          indexMapping,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-        FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
-      case None =>
-        logger.debug(
-          s"Voltages cannot be corrected in iteration $iterationCount"
-        )
-        FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+
+      NewtonRaphsonPF.correctVoltages(
+        lastStateWithIterationPower,
+        deviationVector,
+        jacobianMatrix,
+        sparseSolver,
+      ) match {
+        case Some(correctedState) =>
+          solveIterationStepsRecursively(
+            iterationCount + 1,
+            indexMapping,
+            operationPoint,
+            correctedState,
+          )
+
+        case None =>
+          logger.debug(
+            s"Voltages cannot be corrected in iteration $iterationCount"
+          )
+          FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+      }
     }
   }
 }
