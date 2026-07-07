@@ -8,13 +8,7 @@ package edu.ie3.powerflow.math
 
 import dev.ludovic.netlib.blas.BLAS
 import dev.ludovic.netlib.lapack.LAPACK
-import edu.ie3.powerflow.math.NumericOperations.{
-  Mul,
-  Solve,
-  Split,
-  Sub,
-  Transform,
-}
+import edu.ie3.powerflow.math.NumericOperations.{Mul, Solve, Split, Sub}
 import org.netlib.util.intW
 
 import scala.reflect.ClassTag
@@ -72,12 +66,6 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
     } else {
       (r, c)
     }
-  }
-
-  def rowAndColumn(index: Int): (Int, Int) = {
-    val r = index % majorStride
-    val c = index / majorStride
-    (r, c)
   }
 
   def iterator: Iterator[((Int, Int), V)] = data.iterator.zipWithIndex.map {
@@ -289,12 +277,15 @@ object DenseMatrix {
 
       val vecData: Array[Complex] = vec.asArray
       val matrixData: Array[Complex] = matrix.data
+      val majorStride: Int = matrix.majorStride
 
       val len = matrixData.length
 
       var idx = 0
       while idx < len do {
-        val (r, c) = matrix.rowAndColumn(idx)
+        val r = idx % majorStride
+        val c = idx / majorStride
+
         val mValue = matrixData(idx)
         val vValue = vecData(c)
 
