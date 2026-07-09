@@ -123,45 +123,53 @@ final case class NewtonRaphsonPF(
     val deviationVector =
       NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation, indexMapping)
     val converged = deviationVector.forall(_.abs < epsilon)
-    val jacobianMatrix =
-      JacobianMatrix.buildJacobianMatrix(
-        indexMapping,
-        lastStateWithIterationPower,
-        admittanceMatrix,
-      )
 
-    NewtonRaphsonPF.correctVoltages(
-      lastStateWithIterationPower,
-      deviationVector,
-      jacobianMatrix,
-    ) match {
-      case Some(correctedState) if converged =>
-        logger.debug(
-          s"Power flow calculation converged in iteration $iterationCount"
-        )
-        ValidNewtonRaphsonPFResult(
-          iterationCount,
-          correctedState,
-          jacobianMatrix,
-        )
-      case Some(correctedState)
-          if !converged && iterationCount < maxIterations =>
-        solveIterationStepsRecursively(
-          iterationCount + 1,
+    if converged then {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
           indexMapping,
-          operationPoint,
-          correctedState,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-      case Some(_) if !converged & iterationCount >= maxIterations =>
-        logger.debug(
-          s"Power flow finally did not converge after $iterationCount iterations"
+
+      ValidNewtonRaphsonPFResult(
+        iterationCount,
+        lastStateWithIterationPower,
+        jacobianMatrix,
+      )
+    } else if iterationCount >= maxIterations then {
+      logger.debug(
+        s"Power flow finally did not converge after $iterationCount iterations"
+      )
+      FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
+
+    } else {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
+          indexMapping,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-        FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
-      case None =>
-        logger.debug(
-          s"Voltages cannot be corrected in iteration $iterationCount"
-        )
-        FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+
+      NewtonRaphsonPF.correctVoltages(
+        lastStateWithIterationPower,
+        deviationVector,
+        jacobianMatrix,
+      ) match {
+        case Some(correctedState) =>
+          solveIterationStepsRecursively(
+            iterationCount + 1,
+            indexMapping,
+            operationPoint,
+            correctedState,
+          )
+
+        case None =>
+          logger.debug(
+            s"Voltages cannot be corrected in iteration $iterationCount"
+          )
+          FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+      }
     }
   }
 }
@@ -294,7 +302,7 @@ case object NewtonRaphsonPF extends LazyLogging {
 
     val nodalPower = v *:* (admittanceMatrix * v).map(_.conjugate)
     state
-      .zip(nodalPower.asArray)
+      .zip(nodalPower.data)
       .map(stateAndPowerPair =>
         stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
       )
@@ -323,7 +331,7 @@ case object NewtonRaphsonPF extends LazyLogging {
     else {
       val intermediateOperationPoint =
         operationPoint
-          .zip(iterationPower.asArray)
+          .zip(iterationPower.data)
           .map { nodeDataWithPower =>
             val nodeData = nodeDataWithPower._1
             val power = nodeDataWithPower._2
@@ -501,8 +509,8 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
-          deltaE.asArray
-            .zip(deltaF.asArray)
+          deltaE.data
+            .zip(deltaF.data)
             .map(complexPair => Complex(complexPair._1, complexPair._2))
 
         val indicesOfPVPQnodes =

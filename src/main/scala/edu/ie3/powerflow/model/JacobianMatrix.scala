@@ -54,11 +54,13 @@ object JacobianMatrix {
     val offsetJ6 = offsetJ4 + countNoSlackAndPV
     val pqOffset = indexMapping.nodeCountPQ - 1
 
-    for col <- 0 until countNoSlack do {
+    var col = 0
+    while col < countNoSlack do {
       val oldCol = admittanceCols(indexesWithoutSlack(col))
 
       // for J1 and J2
-      for row <- 0 until countNoSlack do {
+      var row = 0
+      while row < countNoSlack do {
         val oldRow: Int = indexesWithoutSlack(row)
 
         val c: Complex = oldCol(oldRow)
@@ -84,10 +86,13 @@ object JacobianMatrix {
           array(idxJ1) += gf + be
           array(idxJ2) += ge - bf
         }
+
+        row += 1
       }
 
       // for J3 and J4
-      for row <- 0 until countNoSlackAndPV do {
+      row = 0
+      while row < countNoSlackAndPV do {
         val oldRow: Int = indexesWithoutSlackAndPV(row)
 
         val idxJ3 = calculateActualIndex(row, col, dim, offsetJ3)
@@ -118,10 +123,13 @@ object JacobianMatrix {
           array(idxJ3) = -fi_bij + ge - bf - ei_gij
           array(idxJ4) = -ei_bij - gf - be + fi_gij
         }
+
+        row += 1
       }
 
       // for J5 and J6
-      for row <- 0 until countNoSlackAndPQ do {
+      row = 0
+      while row < countNoSlackAndPQ do {
         if row == col then {
           val v: Complex = voltages(indexesWithoutSlackAndPV(row))
 
@@ -131,7 +139,11 @@ object JacobianMatrix {
           array(idxJ5) = 2 * v.imag
           array(idxJ6) = 2 * v.real
         }
+
+        row += 1
       }
+
+      col += 1
     }
 
     new DenseMatrix[Double](dim, dim, array, dim)

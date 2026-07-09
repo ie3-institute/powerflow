@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
 
 final case class DenseVector[@specialized(Double, Int) V: ClassTag](
     length: Int,
-    private[math] val data: Array[V],
+    private[powerflow] val data: Array[V],
 ) extends NumericOperations[DenseVector[V]] {
 
   def apply(index: Int): V = {
@@ -28,8 +28,6 @@ final case class DenseVector[@specialized(Double, Int) V: ClassTag](
   def slice(from: Int, until: Int): DenseVector[V] = DenseVector(
     data.slice(from, until)
   )
-
-  private[powerflow] def asArray: Array[V] = data
 
   def toArray: Array[V] = Array.from(data)
 

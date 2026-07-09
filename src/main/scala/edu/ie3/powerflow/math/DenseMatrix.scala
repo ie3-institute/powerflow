@@ -15,11 +15,10 @@ import scala.reflect.ClassTag
 
 /** A dense matrix with column major memory layout if [[isTransposed]] is false,
   * else with row major memory layout.
-  *
-  * @param cols
-  *   The number of matrix columns.
   * @param rows
   *   The number of matrix rows.
+  * @param cols
+  *   The number of matrix columns.
   * @param data
   *   The actual data of the matrix
   * @param majorStride
@@ -234,11 +233,11 @@ object DenseMatrix {
         matrix.data,
         0,
         matrix.majorStride,
-        vec.asArray,
+        vec.data,
         0,
         1,
         0.0,
-        y.asArray,
+        y.data,
         0,
         1,
       )
@@ -282,10 +281,10 @@ object DenseMatrix {
   given MUL_CMCV
       : Mul[DenseMatrix[Complex], DenseVector[Complex], DenseVector[Complex]] =
     (matrix, vec) => {
-      val realArray: Array[Double] = Array.fill[Double](vec.length)(0d)
-      val imagArray: Array[Double] = Array.fill[Double](vec.length)(0d)
+      val realArray: Array[Double] = Array.ofDim[Double](vec.length)
+      val imagArray: Array[Double] = Array.ofDim[Double](vec.length)
 
-      val vecData: Array[Complex] = vec.asArray
+      val vecData: Array[Complex] = vec.data
       val matrixData: Array[Complex] = matrix.data
       val majorStride: Int = matrix.majorStride
 
@@ -315,15 +314,15 @@ object DenseMatrix {
         n += 1
       }
 
-      DenseVector(array)
+      DenseVector(lenArr, array)
     }
 
   given SOLVE_DMDV
       : Solve[DenseMatrix[Double], DenseVector[Double], DenseVector[Double]] =
     (matrix, vec) => {
       val n = matrix.cols
-      val ipiv = Array.fill(n)(0)
-      val b = vec.asArray
+      val ipiv: Array[Int] = Array.ofDim[Int](n)
+      val b: Array[Double] = vec.data
 
       lapack.dgesv(
         n,
