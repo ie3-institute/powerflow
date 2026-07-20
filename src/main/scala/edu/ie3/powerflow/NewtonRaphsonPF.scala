@@ -74,7 +74,7 @@ final case class NewtonRaphsonPF(
     val indexMapping = IndexMapping(operationPoint)
 
     val startData: Array[StateData] =
-      NewtonRaphsonPF.getInitialState(operationPoint, initData)
+      NewtonRaphsonPF.getInitialState(operationPoint, initData, indexMapping)
 
     /* Solve the inner iterations recursively */
     solveIterationStepsRecursively(
@@ -121,47 +121,55 @@ final case class NewtonRaphsonPF(
         iterationPower,
       )
     val deviationVector =
-      NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation)
+      NewtonRaphsonPF.buildCombinedDeviationVector(nodalDeviation, indexMapping)
     val converged = deviationVector.forall(_.abs < epsilon)
-    val jacobianMatrix =
-      JacobianMatrix.buildJacobianMatrix(
-        indexMapping,
-        lastStateWithIterationPower,
-        admittanceMatrix,
-      )
 
-    NewtonRaphsonPF.correctVoltages(
-      lastStateWithIterationPower,
-      deviationVector,
-      jacobianMatrix,
-    ) match {
-      case Some(correctedState) if converged =>
-        logger.debug(
-          s"Power flow calculation converged in iteration $iterationCount"
-        )
-        ValidNewtonRaphsonPFResult(
-          iterationCount,
-          correctedState,
-          jacobianMatrix,
-        )
-      case Some(correctedState)
-          if !converged && iterationCount < maxIterations =>
-        solveIterationStepsRecursively(
-          iterationCount + 1,
+    if converged then {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
           indexMapping,
-          operationPoint,
-          correctedState,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-      case Some(_) if !converged & iterationCount >= maxIterations =>
-        logger.debug(
-          s"Power flow finally did not converge after $iterationCount iterations"
+
+      ValidNewtonRaphsonPFResult(
+        iterationCount,
+        lastStateWithIterationPower,
+        jacobianMatrix,
+      )
+    } else if iterationCount >= maxIterations then {
+      logger.debug(
+        s"Power flow finally did not converge after $iterationCount iterations"
+      )
+      FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
+
+    } else {
+      val jacobianMatrix =
+        JacobianMatrix.buildJacobianMatrix(
+          indexMapping,
+          lastStateWithIterationPower,
+          admittanceMatrix,
         )
-        FailedNewtonRaphsonPFResult(iterationCount, MaxIterationsReached)
-      case None =>
-        logger.debug(
-          s"Voltages cannot be corrected in iteration $iterationCount"
-        )
-        FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+
+      NewtonRaphsonPF.correctVoltages(
+        lastStateWithIterationPower,
+        deviationVector,
+        jacobianMatrix,
+      ) match {
+        case Some(correctedState) =>
+          solveIterationStepsRecursively(
+            iterationCount + 1,
+            indexMapping,
+            operationPoint,
+            correctedState,
+          )
+
+        case None =>
+          logger.debug(
+            s"Voltages cannot be corrected in iteration $iterationCount"
+          )
+          FailedNewtonRaphsonPFResult(iterationCount, CalculationFailed)
+      }
     }
   }
 }
@@ -191,6 +199,7 @@ case object NewtonRaphsonPF extends LazyLogging {
   def getInitialState(
       operationPoint: Array[PresetData],
       initData: Option[StartData],
+      indexMapping: IndexMapping,
   ): Array[StateData] = {
     val nodeCount = operationPoint.length
 
@@ -257,7 +266,10 @@ case object NewtonRaphsonPF extends LazyLogging {
           lastStatePower,
         )
         val deviationVector =
-          NewtonRaphsonPF.buildCombinedDeviationVector(deviationToLastState)
+          NewtonRaphsonPF.buildCombinedDeviationVector(
+            deviationToLastState,
+            indexMapping,
+          )
         val correctedVoltagesOpt =
           NewtonRaphsonPF.correctVoltages(
             lastStateWithUpdatedSlackVoltage,
@@ -290,7 +302,7 @@ case object NewtonRaphsonPF extends LazyLogging {
 
     val nodalPower = v *:* (admittanceMatrix * v).map(_.conjugate)
     state
-      .zip(nodalPower.toArray)
+      .zip(nodalPower.data)
       .map(stateAndPowerPair =>
         stateAndPowerPair._1.copy(power = stateAndPowerPair._2 * -1)
       )
@@ -319,8 +331,8 @@ case object NewtonRaphsonPF extends LazyLogging {
     else {
       val intermediateOperationPoint =
         operationPoint
-          .zip(iterationPower.toArray)
-          .map(nodeDataWithPower => {
+          .zip(iterationPower.data)
+          .map { nodeDataWithPower =>
             val nodeData = nodeDataWithPower._1
             val power = nodeDataWithPower._2
             nodeData.nodeType match {
@@ -354,7 +366,7 @@ case object NewtonRaphsonPF extends LazyLogging {
                 } else nodeData
               case _ => nodeData
             }
-          })
+          }
 
       Some(intermediateOperationPoint)
     }
@@ -412,31 +424,39 @@ case object NewtonRaphsonPF extends LazyLogging {
     *   reactive power and voltage magnitude
     */
   private def buildCombinedDeviationVector(
-      deviations: Array[DeviationData]
+      deviations: Array[DeviationData],
+      indexMapping: IndexMapping,
   ): DenseVector[Double] = {
-    val pqvDeviationArrays = deviations.foldLeft(
-      (Array.empty[Double], Array.empty[Double], Array.empty[Double])
-    )((arrayTuple, currentEntry) => {
+    val dP = indexMapping.nodeCountWithoutSlack
+    val dQ = indexMapping.countPQWithIntermediate
+
+    val array = Array.ofDim[Double](dP + dQ + indexMapping.nodeCountPV)
+
+    var idxP = 0
+    var idxQ = dP
+    var idxV2 = idxQ + dQ
+
+    deviations.foreach { currentEntry =>
       currentEntry.nodeType match {
         case NodeType.PQ | NodeType.PQ_INTERMEDIATE =>
-          (
-            arrayTuple._1 :+ currentEntry.power.real,
-            arrayTuple._2 :+ currentEntry.power.imag,
-            arrayTuple._3,
-          )
-        case NodeType.PV =>
-          (
-            arrayTuple._1 :+ currentEntry.power.real,
-            arrayTuple._2,
-            arrayTuple._3 :+ currentEntry.squaredVoltageMagnitude,
-          )
-        case NodeType.SL => (arrayTuple._1, arrayTuple._2, arrayTuple._3)
-      }
-    })
+          array(idxP) = currentEntry.power.real
+          array(idxQ) = currentEntry.power.imag
 
-    DenseVector[Double](
-      pqvDeviationArrays._1 ++ pqvDeviationArrays._2 ++ pqvDeviationArrays._3
-    )
+          idxP += 1
+          idxQ += 1
+
+        case NodeType.PV =>
+          array(idxP) = currentEntry.power.real
+          array(idxV2) = currentEntry.squaredVoltageMagnitude
+
+          idxP += 1
+          idxV2 += 1
+
+        case NodeType.SL =>
+      }
+    }
+
+    DenseVector(array)
   }
 
   /** Solve the linearised system of equations and apply the result onto the
@@ -489,8 +509,8 @@ case object NewtonRaphsonPF extends LazyLogging {
         val deltaF = correction.slice(0, nodeCount - 1)
         val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
         val correctionComplex =
-          deltaE.toArray
-            .zip(deltaF.toArray)
+          deltaE.data
+            .zip(deltaF.data)
             .map(complexPair => Complex(complexPair._1, complexPair._2))
 
         val indicesOfPVPQnodes =
@@ -513,23 +533,14 @@ case object NewtonRaphsonPF extends LazyLogging {
           StateData.extractVoltageVector(lastState) - correctionFilledUp
 
         /* Build the corrected voltages */
-        val nextState =
-          lastState.zipWithIndex
-            .foldLeft(Array.empty[StateData])(
-              (nodeStateArray, lastNodeStateWithIndex) => {
-                val index = lastNodeStateWithIndex._2
-                val nodeState = lastNodeStateWithIndex._1
-
-                nodeState.nodeType match {
-                  case NodeType.SL =>
-                    nodeStateArray :+ nodeState
-                  case _ =>
-                    nodeStateArray :+ nodeState.copy(
-                      voltage = newVoltages(index)
-                    )
-                }
-              }
-            )
+        val nextState = lastState.zipWithIndex.map { case (nodeState, index) =>
+          nodeState.nodeType match {
+            case NodeType.SL =>
+              nodeState
+            case _ =>
+              nodeState.copy(voltage = newVoltages(index))
+          }
+        }
         Some(nextState)
       case Failure(exception) =>
         logger.error(

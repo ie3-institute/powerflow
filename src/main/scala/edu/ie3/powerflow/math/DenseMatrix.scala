@@ -15,11 +15,10 @@ import scala.reflect.ClassTag
 
 /** A dense matrix with column major memory layout if [[isTransposed]] is false,
   * else with row major memory layout.
-  *
-  * @param cols
-  *   The number of matrix columns.
   * @param rows
   *   The number of matrix rows.
+  * @param cols
+  *   The number of matrix columns.
   * @param data
   *   The actual data of the matrix
   * @param majorStride
@@ -30,23 +29,25 @@ import scala.reflect.ClassTag
   * @tparam V
   *   The type of data this matrix holds.
   */
-final class DenseMatrix[@specialized(Double) V: ClassTag](
-    val rows: Int,
-    val cols: Int,
+final case class DenseMatrix[@specialized(Double) V: ClassTag](
+    rows: Int,
+    cols: Int,
     private val data: Array[V],
     private val majorStride: Int,
-    val isTransposed: Boolean = false,
+    isTransposed: Boolean = false,
 ) extends NumericOperations[DenseMatrix[V]] {
 
   def linearSize: Int = rows * cols
 
   def apply(row: Int, col: Int): V = data(linearIndex(row, col))
 
+  def getCols: DenseVector[DenseVector[V]] = DenseVector(columnIterator.toArray)
+
+  def asArray2D: Array[Array[V]] = colIteratorInternal.toArray[Array[V]]
+
   def update(row: Int, col: Int, value: V): Unit = {
     data(linearIndex(row, col)) = value
   }
-
-  def valueAt(row: Int, column: Int): V = data(linearIndex(row, column))
 
   def linearIndex(row: Int, column: Int): Int = {
     if isTransposed then {
@@ -66,32 +67,38 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
     }
   }
 
-  def iterator: Iterator[((Int, Int), V)] = data.zipWithIndex.map {
+  def iterator: Iterator[((Int, Int), V)] = data.iterator.zipWithIndex.map {
     case (value, idx) => (rowAndColumnFromLinearIndex(idx), value)
-  }.iterator
+  }
 
-  def columnIterator: Iterator[DenseVector[V]] = if !isTransposed then {
-    data.grouped(cols).map(DenseVector.apply)
+  def columnIterator: Iterator[DenseVector[V]] =
+    colIteratorInternal.map(DenseVector.apply)
+
+  private def colIteratorInternal: Iterator[Array[V]] = if !isTransposed then {
+    data.grouped(cols)
   } else {
     Iterator.range(0, cols).map { col =>
-      val vec = new DenseVector(rows, Array.ofDim(rows))
+      val vec: Array[V] = Array.ofDim[V](rows)
 
       for row <- 0 until rows do {
-        vec(row) = valueAt(row, col)
+        vec(row) = apply(row, col)
       }
 
       vec
     }
   }
 
-  def rowIterator: Iterator[DenseVector[V]] = if isTransposed then {
-    data.grouped(cols).map(DenseVector.apply)
+  def rowIterator: Iterator[DenseVector[V]] =
+    rowIteratorInternal.map(DenseVector.apply)
+
+  private def rowIteratorInternal: Iterator[Array[V]] = if isTransposed then {
+    data.grouped(cols)
   } else {
     Iterator.range(0, cols).map { row =>
-      val vec = new DenseVector(rows, Array.ofDim(rows))
+      val vec: Array[V] = Array.ofDim[V](rows)
 
       for col <- 0 until rows do {
-        vec(col) = valueAt(row, col)
+        vec(col) = apply(row, col)
       }
 
       vec
@@ -99,11 +106,11 @@ final class DenseMatrix[@specialized(Double) V: ClassTag](
   }
 
   def map[R: ClassTag](f: V => R): DenseMatrix[R] =
-    new DenseMatrix(rows, cols, data.map(f), majorStride, isTransposed)
+    new DenseMatrix(rows, cols, data.map(f), majorStride)
 
   def foreach[U](f: ((Int, Int), V) => U): Unit =
-    data.zipWithIndex.foreach { case (value, idx) =>
-      f(rowAndColumnFromLinearIndex(idx), value)
+    for idx <- data.indices do {
+      f(rowAndColumnFromLinearIndex(idx), data(idx))
     }
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
@@ -116,6 +123,16 @@ object DenseMatrix {
   private lazy val blas = BLAS.getInstance()
   private lazy val lapack = LAPACK.getInstance()
 
+  def empty[V: ClassTag](
+      rows: Int,
+      cols: Int,
+      isTransposed: Boolean = false,
+  ): DenseMatrix[V] = {
+    val length = cols * rows
+    val data = Array.ofDim[V](length)
+    new DenseMatrix(rows, cols, data, cols, isTransposed)
+  }
+
   def filled[V: ClassTag](
       rows: Int,
       cols: Int,
@@ -123,8 +140,15 @@ object DenseMatrix {
       isTransposed: Boolean = false,
   ): DenseMatrix[V] = {
     val length = cols * rows
-    val data = Array.fill(length)(value)
-    new DenseMatrix(cols, rows, data, rows, isTransposed)
+    val data: Array[V] = Array.ofDim[V](length)
+
+    var idx = 0
+    while idx < length do {
+      data(idx) = value
+      idx += 1
+    }
+
+    new DenseMatrix(rows, cols, data, cols, isTransposed)
   }
 
   def apply[R <: Seq[V], V: ClassTag](rows: R*): DenseMatrix[V] = {
@@ -135,7 +159,7 @@ object DenseMatrix {
     }
 
     val matrix =
-      new DenseMatrix(nRows, nCols, Array.ofDim(nRows * nCols), nCols)
+      new DenseMatrix(nRows, nCols, Array.ofDim[V](nRows * nCols), nCols)
 
     rows.zipWithIndex.foreach { case (rowData, row) =>
       rowData.zipWithIndex.foreach { case (value, col) =>
@@ -151,28 +175,48 @@ object DenseMatrix {
     matrix => {
       val cols = matrix.cols
       val rows = matrix.rows
+      val data = matrix.data
+      val majorStride = matrix.majorStride
 
-      val realPart = filled(cols, rows, 0d, matrix.isTransposed)
-      val imagPart = filled(cols, rows, 0d, matrix.isTransposed)
+      val len = matrix.linearSize
 
-      matrix.foreach { case ((row, col), value) =>
-        realPart(row, col) = value.real
-        imagPart(row, col) = value.imag
+      val real = Array.ofDim[Double](len)
+      val imag = Array.ofDim[Double](len)
+
+      var idx = 0
+
+      while idx < len do {
+        val c: Complex = data(idx)
+        real(idx) = c.real
+        imag(idx) = c.imag
+
+        idx += 1
       }
 
-      (realPart, imagPart)
+      (
+        DenseMatrix(rows, cols, real, majorStride),
+        DenseMatrix(rows, cols, imag, majorStride),
+      )
     }
 
   given SUB_DMDM
       : Sub[DenseMatrix[Double], DenseMatrix[Double], DenseMatrix[Double]] =
     (matrix1, matrix2) => {
-      val res = DenseMatrix.filled(matrix1.rows, matrix1.cols, 0d)
+      val array: Array[Double] = Array.ofDim[Double](matrix1.linearSize)
+      val data1: Array[Double] = matrix1.data
+      val data2: Array[Double] = matrix2.data
 
-      matrix1.iterator.foreach { case ((row, col), value) =>
-        res(row, col) = value - matrix2(row, col)
+      for idx <- data1.indices do {
+        array(idx) = data1(idx) - data2(idx)
       }
 
-      res
+      DenseMatrix(
+        matrix1.rows,
+        matrix2.cols,
+        array,
+        matrix1.majorStride,
+        matrix1.isTransposed,
+      )
     }
 
   given MUL_RMRV
@@ -187,41 +231,109 @@ object DenseMatrix {
         if matrix.isTransposed then matrix.rows else matrix.cols,
         1.0,
         matrix.data,
+        0,
         matrix.majorStride,
         vec.data,
+        0,
         1,
         0.0,
         y.data,
+        0,
         1,
       )
 
       y
     }
 
+  given MUL_RMRM
+      : Mul[DenseMatrix[Double], DenseMatrix[Double], DenseMatrix[Double]] =
+    (matrixA, matrixB) => {
+      val transA = if matrixA.isTransposed then "T" else "N"
+      val transB = if matrixB.isTransposed then "T" else "N"
+
+      val m = if matrixA.isTransposed then matrixA.cols else matrixA.rows
+      val n = if matrixB.isTransposed then matrixB.rows else matrixB.cols
+
+      val dataC: Array[Double] = Array.ofDim[Double](m * n)
+
+      blas.dgemm(
+        transA,
+        transB,
+        m,
+        n,
+        if matrixA.isTransposed then matrixA.rows else matrixA.cols,
+        1.0,
+        matrixA.data,
+        0,
+        matrixA.majorStride,
+        matrixB.data,
+        0,
+        matrixB.majorStride,
+        0.0,
+        dataC,
+        0,
+        m,
+      )
+
+      new DenseMatrix[Double](n, m, dataC, m)
+    }
+
   given MUL_CMCV
       : Mul[DenseMatrix[Complex], DenseVector[Complex], DenseVector[Complex]] =
     (matrix, vec) => {
-      val data = matrix.rowIterator.map { row =>
-        row * vec
-      }.toArray
+      val realArray: Array[Double] = Array.ofDim[Double](vec.length)
+      val imagArray: Array[Double] = Array.ofDim[Double](vec.length)
 
-      DenseVector(data)
+      val vecData: Array[Complex] = vec.data
+      val matrixData: Array[Complex] = matrix.data
+      val majorStride: Int = matrix.majorStride
+
+      val len = matrixData.length
+
+      var idx = 0
+      while idx < len do {
+        val r = idx % majorStride
+        val c = idx / majorStride
+
+        val mValue = matrixData(idx)
+        val vValue = vecData(c)
+
+        realArray(r) += mValue.real * vValue.real - mValue.imag * vValue.imag
+        imagArray(r) += mValue.real * vValue.imag + mValue.imag * vValue.real
+
+        idx += 1
+      }
+
+      val array: Array[Complex] = Array.ofDim[Complex](vec.length)
+
+      val lenArr = realArray.length
+      var n = 0
+      while n < lenArr do {
+        array(n) = Complex(realArray(n), imagArray(n))
+
+        n += 1
+      }
+
+      DenseVector(lenArr, array)
     }
 
   given SOLVE_DMDV
       : Solve[DenseMatrix[Double], DenseVector[Double], DenseVector[Double]] =
     (matrix, vec) => {
       val n = matrix.cols
-      val ipiv = Array.fill(n)(0)
-      val b = vec.toArray
+      val ipiv: Array[Int] = Array.ofDim[Int](n)
+      val b: Array[Double] = vec.data
 
       lapack.dgesv(
         n,
         1,
         matrix.data,
+        0,
         n,
         ipiv,
+        0,
         b,
+        0,
         n,
         new intW(0),
       )
