@@ -123,12 +123,7 @@ object NodeData extends LazyLogging {
       */
     def extractPowerVector(
         presetDatas: Array[PresetData]
-    ): DenseVector[Complex] = {
-      DenseVector(
-        presetDatas
-          .foldLeft(Array.empty[Complex])((array, data) => array :+ data.power)
-      )
-    }
+    ): DenseVector[Complex] = DenseVector(presetDatas.map(_.power))
   }
 
   /** Representing the current state of the node

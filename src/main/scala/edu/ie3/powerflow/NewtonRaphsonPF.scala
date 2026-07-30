@@ -518,12 +518,17 @@ case object NewtonRaphsonPF extends LazyLogging {
 
     correction match {
       case Success(correction) =>
-        val deltaF = correction.slice(0, nodeCount - 1)
-        val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2)
-        val correctionComplex =
-          deltaE.data
-            .zip(deltaF.data)
-            .map(complexPair => Complex(complexPair._1, complexPair._2))
+        val deltaF = correction.slice(0, nodeCount - 1).data
+        val deltaE = correction.slice(nodeCount - 1, 2 * nodeCount - 2).data
+
+        val len = deltaE.length
+        val correctionComplex = new Array[Complex](len)
+
+        var idx = 0
+        while idx < len do {
+          correctionComplex(idx) = Complex(deltaE(idx), deltaF(idx))
+          idx += 1
+        }
 
         val indicesOfPVPQnodes =
           lastState.zipWithIndex
