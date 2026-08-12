@@ -109,7 +109,14 @@ tasks.withType(Javadoc){
   options.encoding = 'UTF-8'
 }
 
-tasks.withType(ScalaCompile) {
+tasks.withType(ScalaCompile).configureEach {
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
+    "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
+    "-P:scapegoat:dataDir:" + project.layout.buildDirectory.get().asFile.absolutePath + "/reports/scapegoat/src/",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
+    "-P:scapegoat:ignoredFiles:.*/PowerFactoryGrid.scala"
+  ]
+
   options.forkOptions.jvmArgs += [
     '-Xmx4096m',
     '-Xss4m',
