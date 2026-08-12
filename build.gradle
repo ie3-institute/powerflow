@@ -18,6 +18,15 @@ ext {
   scapegoatVersion = '3.3.6'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
+  scala3compilerOptions = [
+    "-print-tasty",
+    "-feature",
+    "-language:implicitConversions",
+    "-language:existentials",
+    "-Wunused:all",
+    "-Xmax-inlines:128",
+    "-Xunchecked-java-output-version:21"
+  ]
 }
 
 group = 'com.github.ie3-institute'
@@ -75,7 +84,7 @@ dependencies {
  * see https://docs.gradle.org/current/userguide/scala_plugin.html#sec:configure_scala_classpath for details
  */
 compileScala {
-  scalaCompileOptions.additionalParameters = [
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
@@ -85,10 +94,10 @@ compileScala {
 
 // separate scapegoat report for test classes
 compileTestScala {
-  scalaCompileOptions.additionalParameters = [
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
-    "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
-    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes"
+    "-P:scapegoat:dataDir:" + project.layout.buildDirectory.get().asFile.absolutePath + "/reports/scapegoat/src/",
+    "-P:scapegoat:disabledInspections:TryGet:ComparingFloatingPointTypes"
   ]
 }
 
