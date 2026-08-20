@@ -96,16 +96,16 @@ compileScala {
 compileTestScala {
   scalaCompileOptions.additionalParameters = scala3compilerOptions + [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
-    "-P:scapegoat:dataDir:" + project.layout.buildDirectory.get().asFile.absolutePath + "/reports/scapegoat/src/",
-    "-P:scapegoat:disabledInspections:TryGet:ComparingFloatingPointTypes"
+    "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes"
   ]
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
 }
 
-tasks.withType(Javadoc){
+tasks.withType(Javadoc).configureEach {
   options.encoding = 'UTF-8'
 }
 
