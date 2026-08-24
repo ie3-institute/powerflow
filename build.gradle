@@ -13,11 +13,20 @@ plugins {
 ext {
   javaVersion = JavaVersion.VERSION_25
   scalaVersion = '3'
-  scalaBinaryVersion = '3.7.4'
+  scalaBinaryVersion = '3.8.4'
 
-  scapegoatVersion = '3.2.4'
+  scapegoatVersion = '3.3.6'
 
   scriptsLocation = 'gradle' + File.separator + 'scripts' + File.separator //location of script plugins
+  scala3compilerOptions = [
+    "-print-tasty",
+    "-feature",
+    "-language:implicitConversions",
+    "-language:existentials",
+    "-Wunused:all",
+    "-Xmax-inlines:128",
+    "-Xunchecked-java-output-version:21"
+  ]
 }
 
 group = 'com.github.ie3-institute'
@@ -75,7 +84,7 @@ dependencies {
  * see https://docs.gradle.org/current/userguide/scala_plugin.html#sec:configure_scala_classpath for details
  */
 compileScala {
-  scalaCompileOptions.additionalParameters = [
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/src/",
     "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
@@ -85,22 +94,29 @@ compileScala {
 
 // separate scapegoat report for test classes
 compileTestScala {
-  scalaCompileOptions.additionalParameters = [
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
     "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
     "-P:scapegoat:dataDir:" + rootDir + "/build/reports/scapegoat/testsrc/",
     "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes"
   ]
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   options.encoding = 'UTF-8'
 }
 
-tasks.withType(Javadoc){
+tasks.withType(Javadoc).configureEach {
   options.encoding = 'UTF-8'
 }
 
-tasks.withType(ScalaCompile) {
+tasks.withType(ScalaCompile).configureEach {
+  scalaCompileOptions.additionalParameters = scala3compilerOptions + [
+    "-Xplugin:" + configurations.scalaCompilerPlugin.asPath,
+    "-P:scapegoat:dataDir:" + project.layout.buildDirectory.get().asFile.absolutePath + "/reports/scapegoat/src/",
+    "-P:scapegoat:disabledInspections:ComparingFloatingPointTypes",
+    "-P:scapegoat:ignoredFiles:.*/PowerFactoryGrid.scala"
+  ]
+
   options.forkOptions.jvmArgs += [
     '-Xmx4096m',
     '-Xss4m',
