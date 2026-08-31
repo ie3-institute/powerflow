@@ -86,7 +86,7 @@ object JacobianMatrix {
           array(idxJ1) += gf + be
           array(idxJ2) += ge - bf
         }
-        
+
         row += 1
       }
 
@@ -123,7 +123,7 @@ object JacobianMatrix {
           array(idxJ3) = -fi_bij + ge - bf - ei_gij
           array(idxJ4) = -ei_bij - gf - be + fi_gij
         }
-        
+
         row += 1
       }
 
@@ -139,10 +139,10 @@ object JacobianMatrix {
           array(idxJ5) = 2 * v.imag
           array(idxJ6) = 2 * v.real
         }
-        
+
         row += 1
       }
-      
+
       col += 1
     }
 
