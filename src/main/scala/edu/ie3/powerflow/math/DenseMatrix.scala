@@ -194,7 +194,8 @@ object DenseMatrix {
       nonZeroEl
     }
 
-    def isSparse(nonZeroElementCount: Int): Boolean = nonZeroElementCount < matrix.linearSize / 10 * 4
+    def isSparse(nonZeroElementCount: Int): Boolean =
+      nonZeroElementCount < matrix.linearSize / 10 * 4
 
     def toSparse(nonZeroElementCount: Int): CSCMatrix = {
       val rows: Int = matrix.rows

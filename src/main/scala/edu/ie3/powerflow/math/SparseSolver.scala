@@ -6,7 +6,6 @@
 
 package edu.ie3.powerflow.math
 
-
 trait SparseSolver {
 
   def solve(
