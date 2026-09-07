@@ -106,7 +106,7 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
   }
 
   def map[R: ClassTag](f: V => R): DenseMatrix[R] =
-    new DenseMatrix(rows, cols, data.map(f), majorStride)
+    new DenseMatrix(rows, cols, data.map(f), majorStride, isTransposed)
 
   def foreach[U](f: ((Int, Int), V) => U): Unit =
     for idx <- data.indices do {
@@ -206,8 +206,16 @@ object DenseMatrix {
       val data1: Array[Double] = matrix1.data
       val data2: Array[Double] = matrix2.data
 
-      for idx <- data1.indices do {
-        array(idx) = data1(idx) - data2(idx)
+      if (matrix1.isTransposed == matrix2.isTransposed) {
+              for idx <- data1.indices do {
+                array(idx) = data1(idx) - data2(idx)
+              }
+      } else {
+        for idx <- data1.indices do {
+          val (r, c) = matrix1.rowAndColumn(idx)
+          val data2Idx = matrix2.linearIndex(r, c)
+          array(idx) = data1(idx) - data2(data2Idx)
+        }
       }
 
       DenseMatrix(
