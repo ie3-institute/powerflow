@@ -206,10 +206,10 @@ object DenseMatrix {
       val data1: Array[Double] = matrix1.data
       val data2: Array[Double] = matrix2.data
 
-      if (matrix1.isTransposed == matrix2.isTransposed) {
-              for idx <- data1.indices do {
-                array(idx) = data1(idx) - data2(idx)
-              }
+      if matrix1.isTransposed == matrix2.isTransposed then {
+        for idx <- data1.indices do {
+          array(idx) = data1(idx) - data2(idx)
+        }
       } else {
         for idx <- data1.indices do {
           val (r, c) = matrix1.rowAndColumn(idx)
