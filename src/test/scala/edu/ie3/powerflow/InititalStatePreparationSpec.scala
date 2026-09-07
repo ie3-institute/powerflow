@@ -7,6 +7,7 @@
 package edu.ie3.powerflow
 
 import edu.ie3.powerflow.math.Complex
+import edu.ie3.powerflow.model.IndexMapping
 import edu.ie3.powerflow.model.NodeData.StateData
 import edu.ie3.powerflow.model.StartData.{
   WithForcedStartVoltages,
@@ -31,7 +32,10 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(4, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 4 */
         StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 5 */
       )
-      val actual = NewtonRaphsonPF.getInitialState(operationPoint, None)
+
+      val indexMapping = IndexMapping(expected)
+      val actual =
+        NewtonRaphsonPF.getInitialState(operationPoint, None, indexMapping)
 
       actual should be(expected)
     }
@@ -58,8 +62,14 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(4, NodeType.PV, Complex(0.98, 0.0), Complex.zero),
         StateData(5, NodeType.PQ, Complex(0.975, 0.0), Complex.zero),
       )
+      val indexMapping = IndexMapping(expected)
+
       val actual =
-        NewtonRaphsonPF.getInitialState(operationPoint, withForcedState)
+        NewtonRaphsonPF.getInitialState(
+          operationPoint,
+          withForcedState,
+          indexMapping,
+        )
 
       actual should be(expected)
     }
@@ -81,8 +91,15 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
         StateData(4, NodeType.PV, Complex.one, Complex(5, 0)), /* Node 4 */
         StateData(5, NodeType.PQ, Complex.one, Complex(5, 0)), /* Node 5 */
       )
+
+      val indexMapping = IndexMapping(expected)
+
       val actual =
-        NewtonRaphsonPF.getInitialState(operationPoint, withForcedSlackVoltage)
+        NewtonRaphsonPF.getInitialState(
+          operationPoint,
+          withForcedSlackVoltage,
+          indexMapping,
+        )
 
       actual should be(expected)
     }
@@ -126,8 +143,14 @@ class InititalStatePreparationSpec extends UnitSpec with SixNodesTestData {
           WithLastState(lastState, Complex.one, expectedJacobianMatrix)
         )
 
+      val indexMapping = IndexMapping(lastState)
+
       val actual =
-        NewtonRaphsonPF.getInitialState(operationPoint, withLastState)
+        NewtonRaphsonPF.getInitialState(
+          operationPoint,
+          withLastState,
+          indexMapping,
+        )
 
       val expectedNewState = Array(
         StateData(

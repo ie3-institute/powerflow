@@ -35,6 +35,8 @@ trait NumericOperations[V1] {
 
   def \[V2, R](that: V2)(using op: Solve[V1, V2, R]): R = op(this, that)
 
+  def transform[R](using op: Transform[V1, R]): R = op(this)
+
 }
 
 object NumericOperations {
@@ -58,4 +60,6 @@ object NumericOperations {
   trait Split[V, R1, R2] extends (V => (R1, R2))
 
   trait Solve[V1, V2, R] extends ((V1, V2) => R)
+
+  trait Transform[V, R] extends (V => R)
 }
