@@ -212,7 +212,7 @@ object DenseMatrix {
         }
       } else {
         for idx <- data1.indices do {
-          val (r, c) = matrix1.rowAndColumn(idx)
+          val (r, c) = matrix1.rowAndColumnFromLinearIndex(idx)
           val data2Idx = matrix2.linearIndex(r, c)
           array(idx) = data1(idx) - data2(data2Idx)
         }
