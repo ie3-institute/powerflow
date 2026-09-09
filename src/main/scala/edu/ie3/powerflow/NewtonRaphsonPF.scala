@@ -7,7 +7,8 @@
 package edu.ie3.powerflow
 
 import com.typesafe.scalalogging.LazyLogging
-import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector}
+import edu.ie3.powerflow.libraries.UMFPACK
+import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector, SparseSolver}
 import edu.ie3.powerflow.model.*
 import edu.ie3.powerflow.model.FailureCause.{
   CalculationFailed,
@@ -48,6 +49,7 @@ final case class NewtonRaphsonPF(
     epsilon: Double,
     maxIterations: Integer,
     admittanceMatrix: DenseMatrix[Complex],
+    sparseSolver: Option[SparseSolver] = None,
 ) extends LazyLogging {
   if admittanceMatrix.rows != admittanceMatrix.cols then
     throw new PowerFlowException("Have a square matrix ready!")
@@ -74,7 +76,12 @@ final case class NewtonRaphsonPF(
     val indexMapping = IndexMapping(operationPoint)
 
     val startData: Array[StateData] =
-      NewtonRaphsonPF.getInitialState(operationPoint, initData, indexMapping)
+      NewtonRaphsonPF.getInitialState(
+        operationPoint,
+        initData,
+        indexMapping,
+        sparseSolver,
+      )
 
     /* Solve the inner iterations recursively */
     solveIterationStepsRecursively(
@@ -155,6 +162,7 @@ final case class NewtonRaphsonPF(
         lastStateWithIterationPower,
         deviationVector,
         jacobianMatrix,
+        sparseSolver,
       ) match {
         case Some(correctedState) =>
           solveIterationStepsRecursively(
@@ -200,6 +208,7 @@ case object NewtonRaphsonPF extends LazyLogging {
       operationPoint: Array[PresetData],
       initData: Option[StartData],
       indexMapping: IndexMapping,
+      sparseSolver: Option[SparseSolver] = None,
   ): Array[StateData] = {
     val nodeCount = operationPoint.length
 
@@ -275,6 +284,7 @@ case object NewtonRaphsonPF extends LazyLogging {
             lastStateWithUpdatedSlackVoltage,
             deviationVector,
             jacobianMatrix,
+            sparseSolver,
           )
 
         correctedVoltagesOpt.getOrElse(operationPoint.map(op => StateData(op)))
@@ -475,11 +485,24 @@ case object NewtonRaphsonPF extends LazyLogging {
       lastState: Array[StateData],
       deviation: DenseVector[Double],
       jacobianMatrix: DenseMatrix[Double],
+      sparseSolver: Option[SparseSolver] = None,
   ): Option[Array[StateData]] = {
     val nodeCount = lastState.length
 
     val correction: Try[DenseVector[Double]] = Try {
-      jacobianMatrix \ deviation
+      sparseSolver match {
+        case Some(solver) =>
+          val nonZeroElCount = jacobianMatrix.countNonZeroElements
+
+          if jacobianMatrix.isSparse(nonZeroElCount) then {
+            solver.solve(jacobianMatrix.toSparse(nonZeroElCount), deviation)
+          } else {
+            jacobianMatrix \ deviation
+          }
+
+        case _ =>
+          jacobianMatrix \ deviation
+      }
     }.recoverWith {
       case e: IllegalArgumentException =>
         Failure(
