@@ -8,16 +8,17 @@ package edu.ie3.powerflow.math
 
 /** A representation of a sparse matrix. This class is only a container for some
   * data.
+  * @param rows
+  *   The number of matrix rows
   * @param cols
   *   The number of matrix columns.
-  * @param rows
-  *   The number of matrix rows.
   * @param colOffset
-  *   The start index of a column in the value array.
+  *   An array containing the starting indices in [[rowIndices]] and [[values]]
+  *   for each column.
   * @param rowIndices
-  *   The row index of a value in the value array.
+  *   An array containing the row indices corresponding to each non-zero value.
   * @param values
-  *   The non-zero elements of the matrix.
+  *   An array containing the actual non-zero elements.
   */
 final case class CSCMatrix(
     rows: Int,

@@ -76,7 +76,12 @@ final case class NewtonRaphsonPF(
     val indexMapping = IndexMapping(operationPoint)
 
     val startData: Array[StateData] =
-      NewtonRaphsonPF.getInitialState(operationPoint, initData, indexMapping, sparseSolver)
+      NewtonRaphsonPF.getInitialState(
+        operationPoint,
+        initData,
+        indexMapping,
+        sparseSolver,
+      )
 
     /* Solve the inner iterations recursively */
     solveIterationStepsRecursively(
