@@ -12,6 +12,7 @@ import edu.ie3.powerflow.model.NodeData.{DeviationData, StateData}
 import edu.ie3.powerflow.model.PowerFlowResult
 import edu.ie3.powerflow.model.PowerFlowResult.FailedPowerFlowResult.FailedNewtonRaphsonPFResult
 import edu.ie3.powerflow.model.PowerFlowResult.SuccessFullPowerFlowResult.ValidNewtonRaphsonPFResult
+import edu.ie3.powerflow.model.{IndexMapping, PowerFlowResult}
 import edu.ie3.test.common.UnitSpec
 import edu.ie3.test.common.powerflow.SixNodesTestData
 
@@ -84,7 +85,10 @@ class SixNodesNewtonRaphsonSpec extends UnitSpec with SixNodesTestData {
         PrivateMethod[DenseVector[Double]](
           Symbol("buildCombinedDeviationVector")
         )
-      val actual = NewtonRaphsonPF invokePrivate method(expectedDeviation)
+
+      val indexMapping = IndexMapping(initialState)
+      val actual =
+        NewtonRaphsonPF invokePrivate method(expectedDeviation, indexMapping)
 
       actual.length should be(2 * nodeCount - 2)
 

@@ -34,13 +34,12 @@ class ThreeNodesJacobianMatrixSpec extends UnitSpec with ThreeNodesTestData {
         colIdx <- 0 until expectedJacobianMatrix.rows
       do {
         if abs(
-            actual.valueAt(rowIdx, colIdx) - expectedJacobianMatrix
-              .valueAt(rowIdx, colIdx)
+            actual(rowIdx, colIdx) - expectedJacobianMatrix(rowIdx, colIdx)
           ) > testTolerance
         then
-          logger.debug(s"Mismatch in ($rowIdx, $colIdx): Actual = ${actual
-              .valueAt(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix
-              .valueAt(rowIdx, colIdx)}")
+          logger.debug(
+            s"Mismatch in ($rowIdx, $colIdx): Actual = ${actual(rowIdx, colIdx)}, expected = ${expectedJacobianMatrix(rowIdx, colIdx)}"
+          )
       }
 
       val toleranceRespected =
