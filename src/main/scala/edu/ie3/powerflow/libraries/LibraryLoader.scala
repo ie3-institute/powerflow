@@ -36,7 +36,7 @@ object LibraryLoader {
         try {
           Some(native(path))
         } catch {
-          case e: Throwable =>
+          case _: Throwable =>
             log.warn(
               s"Could not load native library '$path'. Using fallback implementation"
             )
@@ -64,8 +64,7 @@ object LibraryLoader {
   } catch {
     case e: Throwable =>
       log.warn(
-        s"Could not load native library '$path'. Using default implementation",
-        e,
+        s"Could not load native library '$path'. Using default implementation. Issue: $e"
       )
       None
   }

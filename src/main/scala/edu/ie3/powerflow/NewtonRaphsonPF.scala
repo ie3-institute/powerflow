@@ -7,7 +7,6 @@
 package edu.ie3.powerflow
 
 import com.typesafe.scalalogging.LazyLogging
-import edu.ie3.powerflow.libraries.UMFPACK
 import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector, SparseSolver}
 import edu.ie3.powerflow.model.*
 import edu.ie3.powerflow.model.FailureCause.{

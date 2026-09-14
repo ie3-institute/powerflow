@@ -6,14 +6,8 @@
 
 package edu.ie3.powerflow.libraries
 
-import java.lang.Long.MAX_VALUE
 import java.lang.foreign.*
-import java.lang.foreign.ValueLayout.{
-  JAVA_BYTE,
-  JAVA_DOUBLE,
-  JAVA_INT,
-  JAVA_LONG,
-}
+import java.lang.foreign.ValueLayout.{JAVA_DOUBLE, JAVA_INT, JAVA_LONG}
 import java.lang.invoke.MethodHandle
 import scala.jdk.CollectionConverters.MapHasAsScala
 import scala.util.Using
@@ -29,7 +23,6 @@ trait Native {
     linker.canonicalLayouts.asScala.toMap
   val C_POINTER: AddressLayout = canonicalLayouts("void*")
     .asInstanceOf[AddressLayout]
-    .withTargetLayout(MemoryLayout.sequenceLayout(MAX_VALUE, JAVA_BYTE))
 
   val libName: String
 

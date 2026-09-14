@@ -36,8 +36,6 @@ object JacobianMatrix {
     val indexesWithoutSlack: Array[Int] = indexMapping.indexesWithoutSlack
     val indexesWithoutSlackAndPV: Array[Int] =
       indexMapping.indexesWithoutSlackAndPV
-    val indexesWithoutSlackAndPQ: Array[Int] =
-      indexMapping.indexesWithoutSlackAndPQ
 
     val dim = 2 * countNoSlack
     val array: Array[Double] = Array.ofDim[Double](dim * dim)

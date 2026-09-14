@@ -8,13 +8,7 @@ package edu.ie3.powerflow.math
 
 import dev.ludovic.netlib.blas.BLAS
 import dev.ludovic.netlib.lapack.LAPACK
-import edu.ie3.powerflow.math.NumericOperations.{
-  Mul,
-  Solve,
-  Split,
-  Sub,
-  Transform,
-}
+import edu.ie3.powerflow.math.NumericOperations.{Mul, Solve, Split, Sub}
 import org.netlib.util.intW
 
 import scala.reflect.ClassTag
@@ -204,8 +198,6 @@ object DenseMatrix {
       val rows: Int = matrix.rows
       val cols: Int = matrix.cols
       val data: Array[Double] = matrix.data
-      val length = data.length
-      var idx: Int = 0
 
       val columnOffset: Array[Int] = Array.ofDim[Int](matrix.cols + 1)
       val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroElementCount)
@@ -214,7 +206,6 @@ object DenseMatrix {
       var colIdx = 0
       var dataIdx = 0
       var count = 0
-      var col = 0
 
       while colIdx < cols do {
         columnOffset(colIdx) = count
