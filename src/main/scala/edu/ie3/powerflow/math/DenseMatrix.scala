@@ -170,6 +170,78 @@ object DenseMatrix {
     matrix
   }
 
+  extension (matrix: DenseMatrix[Double]) {
+
+    def countNonZeroElements: Int = {
+      var nonZeroEl: Int = 0
+      val data: Array[Double] = matrix.data
+      val length = data.length
+      var idx: Int = 0
+
+      while idx < length do {
+        val el: Double = data(idx)
+
+        if el != 0d then {
+          nonZeroEl += 1
+        }
+
+        idx += 1
+      }
+
+      nonZeroEl
+    }
+
+    def isSparse(nonZeroElementCount: Int): Boolean =
+      nonZeroElementCount < matrix.linearSize / 10 * 4
+
+    def toSparse(nonZeroElementCount: Int): CSCMatrix = {
+      val rows: Int = matrix.rows
+      val cols: Int = matrix.cols
+      val data: Array[Double] = matrix.data
+
+      val columnOffset: Array[Int] = Array.ofDim[Int](matrix.cols + 1)
+      val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroElementCount)
+      val values: Array[Double] = Array.ofDim[Double](nonZeroElementCount)
+
+      var colIdx = 0
+      var dataIdx = 0
+      var count = 0
+
+      while colIdx < cols do {
+        columnOffset(colIdx) = count
+
+        var rowIdx = 0
+        val offset = colIdx * rows
+
+        while rowIdx < rows do {
+          val element: Double = data(offset + rowIdx)
+
+          if element != 0.0 then {
+            rowIndices(dataIdx) = rowIdx
+            values(dataIdx) = element
+
+            dataIdx += 1
+            count += 1
+          }
+
+          rowIdx += 1
+        }
+
+        colIdx += 1
+      }
+
+      columnOffset(colIdx) = count
+
+      CSCMatrix(
+        rows,
+        cols,
+        columnOffset,
+        rowIndices,
+        values,
+      )
+    }
+  }
+
   given SPLIT_CM
       : Split[DenseMatrix[Complex], DenseMatrix[Double], DenseMatrix[Double]] =
     matrix => {

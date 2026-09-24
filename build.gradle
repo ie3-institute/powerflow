@@ -8,10 +8,11 @@ plugins {
   id 'net.thauvin.erik.gradle.semver' version '1.0.4' // semantic versioning
   id 'maven-publish'
   id 'signing'
+  id 'com.gradleup.shadow' version '9.6.1' // fat jar
 }
 
 ext {
-  javaVersion = JavaVersion.VERSION_21
+  javaVersion = JavaVersion.VERSION_25
   scalaVersion = '3'
   scalaBinaryVersion = '3.9.0'
 

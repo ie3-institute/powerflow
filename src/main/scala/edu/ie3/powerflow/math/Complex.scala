@@ -6,8 +6,6 @@
 
 package edu.ie3.powerflow.math
 
-import scala.math.floor
-
 /** Immutable complex number.
   * @param real
   *   The real part of this complex number.

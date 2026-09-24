@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added basic readTheDocs structure for documentation [#12](https://github.com/ie3-institute/powerflow/issues/12)
 - Added missing method to `DenseMatrix` [#323](https://github.com/ie3-institute/powerflow/issues/323)
+- Added support for sparse matrix solver [#320](https://github.com/ie3-institute/powerflow/issues/320)
 
 ### Changed
 - Provide error message when fail calculating the correction [#24](https://github.com/ie3-institute/powerflow/issues/24)

@@ -15,13 +15,14 @@ import edu.ie3.powerflow.model.enums.NodeType.{PQ, PQ_INTERMEDIATE, PV, SL}
   *   Maps the full index to the index without slack nodes.
   * @param indexesWithoutSlackAndPV
   *   Maps the full index to the index of only PV and PQ_INTERMEDIATE nodes.
-  * @param indexesWithoutSlackAndPQ
-  *   Maps the full index to the index of only PQ nodes.
+  * @param nodeCountPV
+  *   Count of PV nodes.
+  * @param countPQWithIntermediate
+  *   Count of nodes that are either PQ or PQ_INTERMEDIATE nodes.
   */
 final case class IndexMapping(
     indexesWithoutSlack: Array[Int],
     indexesWithoutSlackAndPV: Array[Int],
-    indexesWithoutSlackAndPQ: Array[Int],
     nodeCountPV: Int,
     countPQWithIntermediate: Int,
 ) {
@@ -35,12 +36,9 @@ object IndexMapping {
   def apply(data: Array[? <: NodeData]): IndexMapping = {
     val withoutSlack = data.filterNot(_.nodeType == SL)
     val withoutSlackAndPV = data.filter(_.nodeType == PQ)
-    val withoutSlackAndPQ =
-      data.filter(n => n.nodeType == PV || n.nodeType == PQ_INTERMEDIATE)
 
     val indexesWithoutSlack = Array.ofDim[Int](withoutSlack.length)
     val indexesWithoutSlackAndPV = Array.ofDim[Int](withoutSlackAndPV.length)
-    val indexesWithoutSlackAndPQ = Array.ofDim[Int](withoutSlackAndPQ.length)
 
     var idx = 0
     withoutSlack.foreach { n =>
@@ -54,16 +52,9 @@ object IndexMapping {
       idx += 1
     }
 
-    idx = 0
-    withoutSlackAndPQ.foreach { n =>
-      indexesWithoutSlackAndPQ(idx) = n.index
-      idx += 1
-    }
-
     new IndexMapping(
       indexesWithoutSlack,
       indexesWithoutSlackAndPV,
-      indexesWithoutSlackAndPQ,
       data.count(_.nodeType == PV),
       data.count(n => n.nodeType == PQ || n.nodeType == PQ_INTERMEDIATE),
     )
