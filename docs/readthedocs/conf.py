@@ -2,7 +2,7 @@
 
 project = u'ie3-powerflow'
 copyright = u'2021. TU Dortmund University, Institute of Energy Systems, Energy Efficiency and Energy Economics, Research group Distribution grid planning and operation '
-version = '0.4'
+version = '0.5.0'
 release = '1.0.0'
 
 # General options

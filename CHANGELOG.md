@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
+
+## [0.5]
+
 ### Added
 - Added basic readTheDocs structure for documentation [#12](https://github.com/ie3-institute/powerflow/issues/12)
 - Added missing method to `DenseMatrix` [#323](https://github.com/ie3-institute/powerflow/issues/323)
@@ -17,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replacing `breeze` with own implementation [#300](https://github.com/ie3-institute/powerflow/issues/300)
 - Refactoring to improve performance [#329](https://github.com/ie3-institute/powerflow/issues/329)
 
-## [0.4]
+## [0.4.0]
 
 ### Added
 - Added dependabot workflow and `CODEOWNERS` [#229](https://github.com/ie3-institute/powerflow/issues/229)
@@ -32,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updating gradle to 9.1.0 [#248](https://github.com/ie3-institute/powerflow/issues/248)
 - Updating Java to 21 [#251](https://github.com/ie3-institute/powerflow/issues/251)
 
-## [0.3]
+## [0.3.0]
 
 ### Added
 - Added Bao and Staudt to list of reviewers [#188](https://github.com/ie3-institute/powerflow/issues/188)
@@ -46,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to `scala3` [#204](https://github.com/ie3-institute/powerflow/issues/204)
 - Bumping gradle to 8.14
 
-## [0.2]
+## [0.2.0]
 
 ### Changed
 - Various updates to CI
@@ -54,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updating to gradle 8.9 [#136](https://github.com/ie3-institute/powerflow/issues/136)
 - Fix spotless deprecations [#197](https://github.com/ie3-institute/powerflow/issues/197)
 
-## [0.1]
+## [0.1.0]
 ### Added
 - Initial project structure and code
 
@@ -66,8 +69,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Spock testing framework
 
-[Unreleased / Snapshot]: https://github.com/ie3-institute/powerflow/compare/0.4...HEAD
-[0.4]: https://github.com/ie3-institute/powerflow/compare/0.3...0.4
-[0.3]: https://github.com/ie3-institute/powerflow/compare/0.2...0.3
-[0.2]: https://github.com/ie3-institute/powerflow/compare/0.1...0.2
-[0.1]: https://github.com/ie3-institute/powerflow/releases/tag/0.1
+[Unreleased / Snapshot]: https://github.com/ie3-institute/powerflow/compare/0.5.0...HEAD
+[0.4.0]: https://github.com/ie3-institute/powerflow/compare/0.4.0...0.5.0
+[0.4.0]: https://github.com/ie3-institute/powerflow/compare/0.3.0...0.4.0
+[0.3.0]: https://github.com/ie3-institute/powerflow/compare/0.2.0...0.3.0
+[0.2.0]: https://github.com/ie3-institute/powerflow/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/ie3-institute/powerflow/releases/tag/0.1.0
