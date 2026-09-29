@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
+### Fixed
+- Fixed publishing to maven central [#354](https://github.com/ie3-institute/powerflow/issues/354)
 
 ## [0.5.0]
 
