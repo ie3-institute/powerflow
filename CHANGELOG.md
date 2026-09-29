@@ -6,8 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased / Snapshot]
 
-### Fixed
-- Fixed publishing to maven central [#354](https://github.com/ie3-institute/powerflow/issues/354)
 
 ## [0.5.0]
 
@@ -21,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved calculation of jacobian matrix [#298](https://github.com/ie3-institute/powerflow/issues/298)
 - Replacing `breeze` with own implementation [#300](https://github.com/ie3-institute/powerflow/issues/300)
 - Refactoring to improve performance [#329](https://github.com/ie3-institute/powerflow/issues/329)
+
+### Fixed
+- Fixed publishing to maven central [#354](https://github.com/ie3-institute/powerflow/issues/354)
 
 ## [0.4.0]
 
