@@ -37,11 +37,13 @@ import scala.util.{Failure, Success, Try}
   * @param epsilon
   *   Permissible deviation between actual (given) use of the grid (P, Q, |V|)
   *   and those values determined during iterative solving of the system of
-  *   equations
+  *   equations.
   * @param maxIterations
-  *   Maximum amount of iterations
+  *   Maximum amount of iterations.
   * @param admittanceMatrix
-  *   The dimensionless admittance matrix describing the grid structure
+  *   The dimensionless admittance matrix describing the grid structure.
+  * @param sparseSolver
+  *   An option for a sparse matrix solver.
   */
 @SerialVersionUID(1L)
 final case class NewtonRaphsonPF(
