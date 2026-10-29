@@ -9,6 +9,7 @@ package edu.ie3.powerflow.math
 import dev.ludovic.netlib.blas.BLAS
 import dev.ludovic.netlib.lapack.LAPACK
 import edu.ie3.powerflow.math.NumericOperations.{Mul, Solve, Split, Sub}
+import edu.ie3.powerflow.{ffor, fforA}
 import org.netlib.util.intW
 
 import scala.reflect.ClassTag
@@ -78,13 +79,7 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
     data.grouped(cols)
   } else {
     Iterator.range(0, cols).map { col =>
-      val vec: Array[V] = Array.ofDim[V](rows)
-
-      for row <- 0 until rows do {
-        vec(row) = apply(row, col)
-      }
-
-      vec
+      fforA[V](0, rows) { row => apply(row, col) }
     }
   }
 
@@ -95,23 +90,16 @@ final case class DenseMatrix[@specialized(Double) V: ClassTag](
     data.grouped(cols)
   } else {
     Iterator.range(0, cols).map { row =>
-      val vec: Array[V] = Array.ofDim[V](rows)
-
-      for col <- 0 until rows do {
-        vec(col) = apply(row, col)
-      }
-
-      vec
+      fforA[V](0, rows) { col => apply(row, col) }
     }
   }
 
   def map[R: ClassTag](f: V => R): DenseMatrix[R] =
     new DenseMatrix(rows, cols, data.map(f), majorStride, isTransposed)
 
-  def foreach[U](f: ((Int, Int), V) => U): Unit =
-    for idx <- data.indices do {
-      f(rowAndColumnFromLinearIndex(idx), data(idx))
-    }
+  def foreach[U](f: ((Int, Int), V) => U): Unit = ffor(0, data.length) { idx =>
+    f(rowAndColumnFromLinearIndex(idx), data(idx))
+  }
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
 
@@ -140,14 +128,7 @@ object DenseMatrix {
       isTransposed: Boolean = false,
   ): DenseMatrix[V] = {
     val length = cols * rows
-    val data: Array[V] = Array.ofDim[V](length)
-
-    var idx = 0
-    while idx < length do {
-      data(idx) = value
-      idx += 1
-    }
-
+    val data: Array[V] = fforA(0, length) { _ => value }
     new DenseMatrix(rows, cols, data, cols, isTransposed)
   }
 
@@ -176,16 +157,13 @@ object DenseMatrix {
       var nonZeroEl: Int = 0
       val data: Array[Double] = matrix.data
       val length = data.length
-      var idx: Int = 0
 
-      while idx < length do {
+      ffor(0, length) { idx =>
         val el: Double = data(idx)
 
         if el != 0d then {
           nonZeroEl += 1
         }
-
-        idx += 1
       }
 
       nonZeroEl
@@ -203,17 +181,14 @@ object DenseMatrix {
       val rowIndices: Array[Int] = Array.ofDim[Int](nonZeroElementCount)
       val values: Array[Double] = Array.ofDim[Double](nonZeroElementCount)
 
-      var colIdx = 0
       var dataIdx = 0
       var count = 0
 
-      while colIdx < cols do {
+      ffor(0, cols) { colIdx =>
         columnOffset(colIdx) = count
-
-        var rowIdx = 0
         val offset = colIdx * rows
 
-        while rowIdx < rows do {
+        ffor(0, rows) { rowIdx =>
           val element: Double = data(offset + rowIdx)
 
           if element != 0.0 then {
@@ -223,14 +198,10 @@ object DenseMatrix {
             dataIdx += 1
             count += 1
           }
-
-          rowIdx += 1
         }
-
-        colIdx += 1
       }
 
-      columnOffset(colIdx) = count
+      columnOffset(cols) = count
 
       CSCMatrix(
         rows,
@@ -255,14 +226,10 @@ object DenseMatrix {
       val real = Array.ofDim[Double](len)
       val imag = Array.ofDim[Double](len)
 
-      var idx = 0
-
-      while idx < len do {
+      ffor(0, len) { idx =>
         val c: Complex = data(idx)
         real(idx) = c.real
         imag(idx) = c.imag
-
-        idx += 1
       }
 
       (
@@ -279,11 +246,11 @@ object DenseMatrix {
       val data2: Array[Double] = matrix2.data
 
       if matrix1.isTransposed == matrix2.isTransposed then {
-        for idx <- data1.indices do {
+        ffor(0, data1.length) { idx =>
           array(idx) = data1(idx) - data2(idx)
         }
       } else {
-        for idx <- data1.indices do {
+        ffor(0, data1.length) { idx =>
           val (r, c) = matrix1.rowAndColumnFromLinearIndex(idx)
           val data2Idx = matrix2.linearIndex(r, c)
           array(idx) = data1(idx) - data2(data2Idx)
@@ -370,8 +337,7 @@ object DenseMatrix {
 
       val len = matrixData.length
 
-      var idx = 0
-      while idx < len do {
+      ffor(0, len) { idx =>
         val r = idx % majorStride
         val c = idx / majorStride
 
@@ -380,18 +346,14 @@ object DenseMatrix {
 
         realArray(r) += mValue.real * vValue.real - mValue.imag * vValue.imag
         imagArray(r) += mValue.real * vValue.imag + mValue.imag * vValue.real
-
-        idx += 1
       }
 
-      val array: Array[Complex] = Array.ofDim[Complex](vec.length)
+      Array.ofDim[Complex](vec.length)
 
       val lenArr = realArray.length
-      var n = 0
-      while n < lenArr do {
-        array(n) = Complex(realArray(n), imagArray(n))
 
-        n += 1
+      val array: Array[Complex] = fforA(0, lenArr) { n =>
+        Complex(realArray(n), imagArray(n))
       }
 
       DenseVector(lenArr, array)

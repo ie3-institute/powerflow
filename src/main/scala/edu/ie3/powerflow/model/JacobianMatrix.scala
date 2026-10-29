@@ -6,6 +6,7 @@
 
 package edu.ie3.powerflow.model
 
+import edu.ie3.powerflow.ffor
 import edu.ie3.powerflow.math.{Complex, DenseMatrix, DenseVector}
 import edu.ie3.powerflow.model.NodeData.StateData
 
@@ -52,13 +53,11 @@ object JacobianMatrix {
     val offsetJ6 = offsetJ4 + countNoSlackAndPV
     val pqOffset = indexMapping.nodeCountPQ - 1
 
-    var col = 0
-    while col < countNoSlack do {
+    ffor(0, countNoSlack) { col =>
       val oldCol = admittanceCols(indexesWithoutSlack(col))
 
-      // for J1 and J2
-      var row = 0
-      while row < countNoSlack do {
+      // for J1 and J2<
+      ffor(0, countNoSlack) { row =>
         val oldRow: Int = indexesWithoutSlack(row)
 
         val c: Complex = oldCol(oldRow)
@@ -84,13 +83,10 @@ object JacobianMatrix {
           array(idxJ1) += gf + be
           array(idxJ2) += ge - bf
         }
-
-        row += 1
       }
 
       // for J3 and J4
-      row = 0
-      while row < countNoSlackAndPV do {
+      ffor(0, countNoSlackAndPV) { row =>
         val oldRow: Int = indexesWithoutSlackAndPV(row)
 
         val idxJ3 = calculateActualIndex(row, col, dim, offsetJ3)
@@ -121,13 +117,10 @@ object JacobianMatrix {
           array(idxJ3) = -fi_bij + ge - bf - ei_gij
           array(idxJ4) = -ei_bij - gf - be + fi_gij
         }
-
-        row += 1
       }
 
       // for J5 and J6
-      row = 0
-      while row < countNoSlackAndPQ do {
+      ffor(0, countNoSlackAndPQ) { row =>
         if row == col then {
           val v: Complex = voltages(indexesWithoutSlackAndPV(row))
 
@@ -137,11 +130,7 @@ object JacobianMatrix {
           array(idxJ5) = 2 * v.imag
           array(idxJ6) = 2 * v.real
         }
-
-        row += 1
       }
-
-      col += 1
     }
 
     new DenseMatrix[Double](dim, dim, array, dim)

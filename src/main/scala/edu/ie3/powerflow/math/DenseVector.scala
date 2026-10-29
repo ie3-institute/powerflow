@@ -6,6 +6,7 @@
 
 package edu.ie3.powerflow.math
 
+import edu.ie3.powerflow.ffor
 import edu.ie3.powerflow.math.NumericOperations.*
 
 import scala.reflect.ClassTag
@@ -34,10 +35,9 @@ final case class DenseVector[@specialized(Double, Int) V: ClassTag](
   def map[R: ClassTag](f: V => R): DenseVector[R] =
     new DenseVector(length, data.map(f))
 
-  def foreach[U](f: (Int, V) => U): Unit =
-    for idx <- data.indices do {
-      f(idx, data(idx))
-    }
+  def foreach[U](f: (Int, V) => U): Unit = ffor(0, length) { i =>
+    f(i, data(i))
+  }
 
   def forall(p: V => Boolean): Boolean = data.forall(p)
 
@@ -83,12 +83,10 @@ object DenseVector {
       val array: Array[Double] = Array.ofDim[Double](len)
       val data = vec.data
 
-      var idx = 0
-      while idx < lenSingle do {
+      ffor(0, lenSingle) { idx =>
         val c: Complex = data(idx)
         array(idx) = c.real
         array(idx + lenSingle) = c.imag
-        idx += 1
       }
 
       DenseMatrix(lenSingle, 2, array, lenSingle)
@@ -105,7 +103,7 @@ object DenseVector {
     (vec1, vec2) => {
       var tmp = Complex.zero
 
-      for idx <- 0 until vec1.length do {
+      ffor(0, vec1.length) { idx =>
         tmp += vec1(idx) * vec2(idx)
       }
 
@@ -117,7 +115,7 @@ object DenseVector {
   ], DenseVector[Complex]] = (vec1, vec2) => {
     val y = DenseVector.filled(vec1.length, Complex.zero)
 
-    for idx <- 0 until vec1.length do {
+    ffor(0, vec1.length) { idx =>
       y(idx) = vec1(idx) * vec2(idx)
     }
 
